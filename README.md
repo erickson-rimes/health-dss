@@ -1,8 +1,6 @@
-# RentalGPT Dash App 
+# Health DSS Dash App 
 
-[Selected as Plotly’s Top ChatGPT & Generative AI Project](https://plotly.com/examples/generative-ai-chatgpt/)
-
-I present the data analysis, data visualization, and Dash application development called "RentalGPT", an interactive, user friendly dashboard that provides services to multiple stakeholders. Using the "Two Sigma Connect: Rental Listing Inquiries" dataset collected from Kaggle, we can do in-depth data analysis, interactive data visualization, and an app that has predictive analytics and virtual assistance.
+This the Health DSS Dash App - a data analysis, data visualization, and Dash application development. This is an interactive, user friendly dashboard that provides services to multiple stakeholders. Using the multiple data sets to be collected from different health sectors, we can do in-depth data analysis, interactive data visualization, and an app that has predictive analytics and virtual assistance.
 
 ## Data Science Life Cycle
 ![](https://raw.githubusercontent.com/mnguyen0226/rental_gpt_dash/main/dash/assets/photos/data_science_life_cycle.png)
