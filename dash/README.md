@@ -3,8 +3,8 @@
 ## How to run
 On your terminal, create a new python environment.
 ```
-conda create -n rental_gpt_app python=3.8
-conda activate rental_gpt_app
+conda create -n health_dss_app python=3.8
+conda activate health_dss_app
 ```
 
 On your terminal, install all package.

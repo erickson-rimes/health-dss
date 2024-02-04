@@ -12,6 +12,9 @@ import pandas as pd
 # file imports
 from maindash import my_app
 
+# header_title = "New York City Apartments Listing"
+header_title = "Facilities Listing"
+
 
 #######################################
 # Layout
@@ -39,7 +42,7 @@ def listing_layout():
                         },
                     ),
                     html.H1(
-                        "New York City Apartments Listing",
+                        header_title,
                         style={
                             "position": "absolute",
                             "top": "80%",
@@ -57,7 +60,7 @@ def listing_layout():
                     "color": "white",
                 },
             ),
-            html.Br(),
+            # html.Br(),
             # Map Display Area
             html.Div(
                 dcc.Graph(id="listing_map_display"),

@@ -35,7 +35,7 @@ sidebar = html.Div(
     [
         html.Div(
             [
-                html.H2("RentalGPT", style={"color": "white"}),
+                html.H2(my_app.title, style={"color": "white"}),
             ],
             className="sidebar-header",
         ),

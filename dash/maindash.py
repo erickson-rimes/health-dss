@@ -7,7 +7,7 @@ my_app = dash.Dash(
     suppress_callback_exceptions=True,
     external_stylesheets=[dbc.themes.MATERIA, dbc.icons.FONT_AWESOME],
 )
-my_app.title = "RentalGPT"
+my_app.title = "Health DSS"
 server = my_app.server
 
 # import the dataset
