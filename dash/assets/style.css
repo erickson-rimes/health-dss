@@ -19,6 +19,11 @@ Reference: https://community.plotly.com/t/sidebar-with-icons-expands-on-hover-an
   .sidebar:hover {
     width: 16rem;
   }
+
+  /* the vertical spacing between two sidebar items */
+  .sidebar-item {
+    margin-bottom: 0.5rem; 
+  }
   
   /* make sure the contents of the navlink don't wrap when navbar collapses */
   .sidebar .nav-link {

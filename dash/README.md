@@ -18,6 +18,11 @@ On your terminal, run the dash application via Bash.
 sh run.sh
 ```
 
+For development mode (with reload), run
+```
+sh run.sh development
+```
+
 ## How to dockerize
 Make sure you have DockerHub account.
 

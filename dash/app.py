@@ -19,7 +19,7 @@ from components.about import about
 from components.overview import overview
 
 #######################################
-# Initial Settings
+# Initial Settings 
 #######################################
 server = my_app.server
 
@@ -34,9 +34,18 @@ CONTENT_STYLE = {
 sidebar = html.Div(
     [
         html.Div(
-            [
-                html.H2(my_app.title, style={"color": "white"}),
-            ],
+            # [
+            #     # html.I(className="fas fa-home"),
+            #     html.H2(my_app.title, style={"color": "white"}),
+            # ],
+            
+            html.Div(
+                    [
+                        html.I(className="fas fa-solid fa-virus px-2 fa-2xl mr-4", style={"color": "white"}),
+                        html.Span(my_app.title, style={"color": "white", "fontSize": "2rem"}),
+                    ],
+                    style={"display": "flex", "align-items": "center"},
+                ),
             className="sidebar-header",
         ),
         html.Br(),
@@ -52,14 +61,16 @@ sidebar = html.Div(
                     ],
                     href="/",
                     active="exact",
+                    className="sidebar-item"
                 ),
                 dbc.NavLink(
                     [
                         html.I(className="fas fa-home me-2"),
-                        html.Span("Apartments Listing"),
+                        html.Span("Facilities Listing"),
                     ],
                     href="/listing",
                     active="exact",
+                    className="sidebar-item"
                 ),
                 dbc.NavLink(
                     [
@@ -68,6 +79,7 @@ sidebar = html.Div(
                     ],
                     href="/analysis",
                     active="exact",
+                    className="sidebar-item"
                 ),
                 dbc.NavLink(
                     [
@@ -76,23 +88,24 @@ sidebar = html.Div(
                     ],
                     href="/visualization",
                     active="exact",
+                    className="sidebar-item"
                 ),
-                dbc.NavLink(
-                    [
-                        html.I(className="fas fa-solid fa-people-group me-2"),
-                        html.Span("Interest Level Prediction"),
-                    ],
-                    href="/interest_level_prediction",
-                    active="exact",
-                ),
-                dbc.NavLink(
-                    [
-                        html.I(className="fas fa-solid fa-arrow-trend-up me-2"),
-                        html.Span("Rental Cost Prediction"),
-                    ],
-                    href="/price_prediction",
-                    active="exact",
-                ),
+                # dbc.NavLink(
+                #     [
+                #         html.I(className="fas fa-solid fa-people-group me-2"),
+                #         html.Span("Interest Level Prediction"),
+                #     ],
+                #     href="/interest_level_prediction",
+                #     active="exact",
+                # ),
+                # dbc.NavLink(
+                #     [
+                #         html.I(className="fas fa-solid fa-arrow-trend-up me-2"),
+                #         html.Span("Rental Cost Prediction"),
+                #     ],
+                #     href="/price_prediction",
+                #     active="exact",
+                # ),
                 # dbc.NavLink(
                 #     [
                 #         html.I(className="fas fa-solid fa-eye me-2"),
@@ -101,22 +114,22 @@ sidebar = html.Div(
                 #     href="/gen_apartment",
                 #     active="exact",
                 # ),
-                dbc.NavLink(
-                    [
-                        html.I(className="fas fa-solid fa-comments me-2"),
-                        html.Span("Virtual Assistant"),
-                    ],
-                    href="/virtual_assistant",
-                    active="exact",
-                ),
-                dbc.NavLink(
-                    [
-                        html.I(className="fas fa-solid fa-code me-2"),
-                        html.Span("About"),
-                    ],
-                    href="/about",
-                    active="exact",
-                ),
+                # dbc.NavLink(
+                #     [
+                #         html.I(className="fas fa-solid fa-comments me-2"),
+                #         html.Span("Virtual Assistant"),
+                #     ],
+                #     href="/virtual_assistant",
+                #     active="exact",
+                # ),
+                # dbc.NavLink(
+                #     [
+                #         html.I(className="fas fa-solid fa-code me-2"),
+                #         html.Span("About"),
+                #     ],
+                #     href="/about",
+                #     active="exact",
+                # ),
             ],
             vertical=True,
             pills=True,
@@ -187,6 +200,19 @@ def render_page_content(pathname):
         ]
     )
 
+# Add a callback to toggle the visibility of the app title icon when the sidebar is collapsed
+# @my_app.callback(
+#     Output("sidebar-icon", "style"),
+#     Output("sidebar-header", "style"),
+#     Input("url", "pathname"),
+#     Input("page-content", "style"),
+# )
+# def toggle_sidebar_icon(pathname, content_style):
+#     print(content_style.get("margin-left"))
+#     if content_style.get("margin-left") == "250px":
+#         return {"display": "block"}, {"display": "none"}
+#     else:
+#         return {"display": "none"}, {"display": "block"}
 
 if __name__ == "__main__":
     my_app.run_server(debug=True, host="0.0.0.0", port=80)
