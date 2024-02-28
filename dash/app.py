@@ -25,7 +25,7 @@ server = my_app.server
 
 CONTENT_STYLE = {
     "transition": "margin-left .1s",
-    "padding": "1rem 1rem",
+    # "padding": "1rem 1rem",
 }
 
 #######################################
@@ -200,19 +200,6 @@ def render_page_content(pathname):
         ]
     )
 
-# Add a callback to toggle the visibility of the app title icon when the sidebar is collapsed
-# @my_app.callback(
-#     Output("sidebar-icon", "style"),
-#     Output("sidebar-header", "style"),
-#     Input("url", "pathname"),
-#     Input("page-content", "style"),
-# )
-# def toggle_sidebar_icon(pathname, content_style):
-#     print(content_style.get("margin-left"))
-#     if content_style.get("margin-left") == "250px":
-#         return {"display": "block"}, {"display": "none"}
-#     else:
-#         return {"display": "none"}, {"display": "block"}
 
 if __name__ == "__main__":
     my_app.run_server(debug=True, host="0.0.0.0", port=80)

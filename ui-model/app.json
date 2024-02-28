@@ -1,0 +1,13 @@
+{"title": "Health DSS",
+    "modules" : [
+        {"icon": "fas fa-solid fa-star me-2", "text": "Overview", "href": "/"},
+        {"icon": "fas fa-home me-2", "text": "Apartments Listing", "href": "/listing"},
+        {"icon": "fas fa-solid fa-chart-simple me-2", "text": "Data Analysis", "href": "/analysis"},
+        {"icon": "fas fa-solid fa-sliders me-2", "text": "Data Visualization", "href": "/visualization"},
+        {"icon": "fas fa-solid fa-people-group me-2", "text": "Interest Level Prediction", "href": "/interest_level_prediction"},
+        {"icon": "fas fa-solid fa-arrow-trend-up me-2", "text": "Rental Cost Prediction", "href": "/price_prediction"},
+        {"icon": "fas fa-solid fa-comments me-2", "text": "Virtual Assistant", "href": "/virtual_assistant"},
+        {"icon": "fas fa-solid fa-code me-2", "text": "About", "href": "/about"}
+    ]
+}
+    

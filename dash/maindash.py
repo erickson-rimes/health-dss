@@ -11,5 +11,5 @@ my_app.title = "Health DSS"
 server = my_app.server
 
 # import the dataset
-url = "https://raw.githubusercontent.com/mnguyen0226/two_sigma_property_listing/main/data/train.json"
+url = "../data/train.json"
 df = pd.read_json(url)
