@@ -15,6 +15,7 @@ from components.interest_level_prediction import interest_level_prediction
 from components.price_prediction import price_prediction
 from components.virtual_assistant import virtual_assistant
 from components.listing import listing
+from components.alert_map import alert_map
 from components.about import about
 from components.overview import overview
 
@@ -49,7 +50,7 @@ sidebar = html.Div(
             className="sidebar-header",
         ),
         html.Br(),
-        html.Div(style={"border-top": "2px solid white"}),
+        # html.Div(style={"border-top": "2px solid white"}),
         html.Br(),
         # nav component
         dbc.Nav(
@@ -60,6 +61,15 @@ sidebar = html.Div(
                         html.Span("Overview"),
                     ],
                     href="/",
+                    active="exact",
+                    className="sidebar-item"
+                ),
+                dbc.NavLink(
+                    [
+                        html.I(className="fas fa-solid fa-warning me-2"),
+                        html.Span("Alerts"),
+                    ],
+                    href="/alert_map",
                     active="exact",
                     className="sidebar-item"
                 ),
@@ -161,6 +171,8 @@ def render_page_content(pathname):
         return overview.overview_layout()
     elif pathname == "/listing":
         return listing.listing_layout()
+    elif pathname == '/alert_map':
+        return alert_map.alert_map_layout()
     elif pathname == "/analysis":
         return analysis.analysis_layout()
     elif pathname == "/visualization":

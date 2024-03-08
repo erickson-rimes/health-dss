@@ -70,20 +70,21 @@ Reference: https://community.plotly.com/t/sidebar-with-icons-expands-on-hover-an
   
   /* position the content relative to the collapsed sidebar */
   .content {
-    margin-left: 7rem;
-    margin-right: 2rem;
-    padding: 2rem 1rem;
+    margin-left: 5rem;
+    /* margin-right: 2rem; */
+    /* padding: 2rem 1rem; */
+    padding-right: 2rem;
   }
 
   /* adjust the margin when the sidebar is not hovered */
   .content {
     transition: margin-left .1s;
-    padding: 1rem 1rem;
+    /* padding: 1rem 1rem; */
   }
 
   /* increase the margin-left of the content when the sidebar is hovered */
   .sidebar:hover ~ .content {
-    margin-left: 18rem;
+    margin-left: 16rem;
   }
 
 /* default non-selected nav link styles */
@@ -120,3 +121,44 @@ Reference: https://community.plotly.com/t/sidebar-with-icons-expands-on-hover-an
   visibility: visible;
   opacity: 1;
 }
+
+.timeline {
+  position: relative;
+  padding: 0;
+  list-style: none;
+}
+
+.timeline .event {
+  /* border-bottom: 1px solid #e5e5e5; */
+  padding-bottom: 16px;
+  margin-bottom: 6px;
+  position: relative;
+}
+
+.timeline .event:last-child {
+  padding-bottom: 0;
+  margin-bottom: 0;
+  border: none;
+}
+
+.timeline .event-date {
+  margin-bottom: 0.125rem; /* mb-1 */
+  font-size: 0.725rem; /* text-sm */
+  font-weight: 400; /* font-normal */
+  color: #9CA3AF; /* text-gray-400 */
+  white-space: nowrap; /* Leading none */
+}
+
+.timeline h3.event-title {
+  font-size: 1rem; /* text-lg */
+  font-weight: 600; /* font-semibold */
+  color: #111827; /* text-gray-900 */
+}
+
+.timeline p.event-detail {
+  font-size: 0.875rem; /* text-base */
+  font-weight: 400; /* font-normal */
+  color: #6B7280; /* text-gray-500 */
+  margin-top: 0.125rem; /* Some spacing between title and detail */
+}
+

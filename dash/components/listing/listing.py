@@ -1,4 +1,3 @@
-import dash
 from dash import html
 from dash import Input
 from dash import Output
@@ -375,7 +374,7 @@ def update_facility_content(facilityType, ownership, accreditationStatus, servic
             center={"lat": center_lat, "lon": center_lon},
             mapbox_style="open-street-map",
         )
-        fig.update_traces(marker=dict(size=10))  # Set a constant marker size
+        fig.update_traces(marker=dict(size=8))  # Set a constant marker size
         fig.update_traces(hovertemplate=hovertemplate)
         fig.update_layout(margin=dict(t=0, b=0, l=0, r=0), showlegend=False, mapbox=dict(
             bearing=0,
