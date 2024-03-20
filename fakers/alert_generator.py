@@ -1,13 +1,4 @@
-import geopandas as gpd
 import random
-from faker import Faker
-from datetime import datetime
-
-# Assuming you have a GDF loaded, if not, load it. For example:
-# gdf = gpd.read_file('your_file.geojson')
-
-# Initialize Faker
-# faker = Faker()
 
 # Function to generate a random alert
 def generate_alert(gdf, faker):
@@ -42,8 +33,3 @@ def generate_alert(gdf, faker):
     }
     
     return alert
-
-# Example usage
-# gdf = gpd.read_file('your_geojson_file_path.geojson')  # Update this path to your GDF file
-# random_alert = generate_random_alert(gdf)
-# print(random_alert)

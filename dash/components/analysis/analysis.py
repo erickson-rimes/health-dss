@@ -38,186 +38,179 @@ from components.analysis.plot_3d_contour import plot_3d_contour_info
 #######################################
 def analysis_layout():
     layout = html.Div(
-        [
-            # image
+            # split horizontally
+        style={"display": "flex"},
+        children = [
             html.Div(
+                style={"width": "75%", "padding": "12px"},
+                children=
                 [
+                html.Div(
+                    # stack vertically
+                    style={"display": "flex", "flex-direction": "column"},
+                    children=[
+                        html.Div(
+                            [
+                                dbc.Tabs(
+                                    id="analysis_selected_tab",
+                                    children=[
+                                        dbc.Tab(
+                                            label="Line Plot",
+                                            tab_id="analysis_line",
+                                        ),
+                                        dbc.Tab(
+                                            label="Bar Plot 1",
+                                            tab_id="analysis_bar_1",
+                                        ),
+                                        # dbc.Tab(
+                                        #     label="Bar Plot 2",
+                                        #     tab_id="analysis_bar_2",
+                                        # ),
+                                        dbc.Tab(
+                                            label="Count Plot 1",
+                                            tab_id="analysis_count_1",
+                                        ),
+                                        # dbc.Tab(
+                                        #     label="Count Plot 2",
+                                        #     tab_id="analysis_count_2",
+                                        # ),
+                                        # dbc.Tab(
+                                        #     label="Count Plot 3",
+                                        #     tab_id="analysis_count_3",
+                                        # ),
+                                        # dbc.Tab(
+                                        #     label="Count Plot 4",
+                                        #     tab_id="analysis_count_4",
+                                        # ),
+                                        # dbc.Tab(
+                                        #     label="Count Plot 5",
+                                        #     tab_id="analysis_count_5",
+                                        # ),
+                                        # dbc.Tab(
+                                        #     label="Count Plot 6",
+                                        #     tab_id="analysis_count_6",
+                                        # ),
+                                        dbc.Tab(
+                                            label="Pie Chart",
+                                            tab_id="analysis_pie",
+                                        ),
+                                        dbc.Tab(
+                                            label="Dist Plot",
+                                            tab_id="analysis_dist",
+                                        ),
+                                        dbc.Tab(
+                                            label="Pair Plot",
+                                            tab_id="analysis_pair",
+                                        ),
+                                        dbc.Tab(
+                                            label="Heatmap",
+                                            tab_id="analysis_heatmap",
+                                        ),
+                                        dbc.Tab(
+                                            label="QQ Plot",
+                                            tab_id="analysis_qq",
+                                        ),
+                                        dbc.Tab(
+                                            label="Reg Plot 1",
+                                            tab_id="analysis_reg_1",
+                                        ),
+                                        # dbc.Tab(
+                                        #     label="Reg Plot 2",
+                                        #     tab_id="analysis_reg_2",
+                                        # ),
+                                        # dbc.Tab(
+                                        #     label="Reg Plot 3",
+                                        #     tab_id="analysis_reg_3",
+                                        # ),
+                                        dbc.Tab(
+                                            label="Area Plot",
+                                            tab_id="analysis_area",
+                                        ),
+                                        dbc.Tab(
+                                            label="Violin Plot",
+                                            tab_id="analysis_violin",
+                                        ),
+                                        dbc.Tab(
+                                            label="Joint Plot 1",
+                                            tab_id="analysis_joint_1",
+                                        ),
+                                        # dbc.Tab(
+                                        #     label="Joint Plot 2",
+                                        #     tab_id="analysis_joint_2",
+                                        # ),
+                                        dbc.Tab(
+                                            label="3D Plot",
+                                            tab_id="analysis_3d",
+                                        ),
+                                        dbc.Tab(
+                                            label="3D Contour Plot",
+                                            tab_id="analysis_3d_contour",
+                                        ),
+                                    ],
+                                    active_tab="analysis_line",
+                                ),
+                            ]
+                        ),
+                    ],
+                ),
+                html.Br(),
+                html.Br(),
+                html.Br(),
+                # content: analysis & plot
+                html.Div(
+                    style={"display": "flex"},
+                    children=[
+                        # html.Div(
+                        #     style={
+                        #         "width": "30%",
+                        #         "padding": "10px",
+                        #     },
+                        #     children=[
+                        #         html.Div(id="analysis_tab_content_layout"),
+                        #     ],
+                        # ),
+                        html.Div(
+                            style={
+                                "width": "100%",
+                                "height": "100%",
+                                "padding": "10px",
+                            },
+                            children=[
+                                html.Div(id="analysis_tab_plot_layout"),
+                            ],
+                        ),
+                    ],
+                ),
+                html.Br(),
+                # download and view code
+                html.Div(),
+                # make invisible
+                html.Div(id="analysis_code", style={"display": "none"}),
+            ]), 
+            html.Div(
+                style={"display": "flex", "width": "25%", "padding": "12px"},
+                children=[
                     html.Div(
-                        [
-                            html.Img(
-                                src="https://images.unsplash.com/photo-1614851099511-773084f6911d?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-                                style={
-                                    "width": "100%",
-                                    "height": "auto",
-                                    "position": "relative",
-                                },
-                            ),
-                        ],
                         style={
-                            "height": "200px",
-                            "overflow": "hidden",
-                            "position": "relative",
-                        },
-                    ),
-                    html.H1(
-                        "Data Analysis",
-                        style={
-                            "position": "absolute",
-                            "top": "80%",
-                            "left": "50%",
-                            "transform": "translate(-50%, -50%)",
-                            "color": "white",
-                            "text-align": "center",
                             "width": "100%",
-                        },
-                    ),
-                ],
-                style={
-                    "position": "relative",
-                    "text-align": "center",
-                    "color": "white",
-                },
-            ),
-            html.Br(),
-            # tab
-            html.Div(
-                style={"display": "flex"},
-                children=[
-                    html.Div(
-                        [
-                            dbc.Tabs(
-                                id="analysis_selected_tab",
-                                children=[
-                                    dbc.Tab(
-                                        label="Line Plot",
-                                        tab_id="analysis_line",
-                                    ),
-                                    dbc.Tab(
-                                        label="Bar Plot 1",
-                                        tab_id="analysis_bar_1",
-                                    ),
-                                    dbc.Tab(
-                                        label="Bar Plot 2",
-                                        tab_id="analysis_bar_2",
-                                    ),
-                                    dbc.Tab(
-                                        label="Count Plot 1",
-                                        tab_id="analysis_count_1",
-                                    ),
-                                    dbc.Tab(
-                                        label="Count Plot 2",
-                                        tab_id="analysis_count_2",
-                                    ),
-                                    dbc.Tab(
-                                        label="Count Plot 3",
-                                        tab_id="analysis_count_3",
-                                    ),
-                                    dbc.Tab(
-                                        label="Count Plot 4",
-                                        tab_id="analysis_count_4",
-                                    ),
-                                    dbc.Tab(
-                                        label="Count Plot 5",
-                                        tab_id="analysis_count_5",
-                                    ),
-                                    dbc.Tab(
-                                        label="Count Plot 6",
-                                        tab_id="analysis_count_6",
-                                    ),
-                                    dbc.Tab(
-                                        label="Pie Chart",
-                                        tab_id="analysis_pie",
-                                    ),
-                                    dbc.Tab(
-                                        label="Dist Plot",
-                                        tab_id="analysis_dist",
-                                    ),
-                                    dbc.Tab(
-                                        label="Pair Plot",
-                                        tab_id="analysis_pair",
-                                    ),
-                                    dbc.Tab(
-                                        label="Heatmap",
-                                        tab_id="analysis_heatmap",
-                                    ),
-                                    dbc.Tab(
-                                        label="QQ Plot",
-                                        tab_id="analysis_qq",
-                                    ),
-                                    dbc.Tab(
-                                        label="Reg Plot 1",
-                                        tab_id="analysis_reg_1",
-                                    ),
-                                    dbc.Tab(
-                                        label="Reg Plot 2",
-                                        tab_id="analysis_reg_2",
-                                    ),
-                                    dbc.Tab(
-                                        label="Reg Plot 3",
-                                        tab_id="analysis_reg_3",
-                                    ),
-                                    dbc.Tab(
-                                        label="Area Plot",
-                                        tab_id="analysis_area",
-                                    ),
-                                    dbc.Tab(
-                                        label="Violin Plot",
-                                        tab_id="analysis_violin",
-                                    ),
-                                    dbc.Tab(
-                                        label="Joint Plot 1",
-                                        tab_id="analysis_joint_1",
-                                    ),
-                                    dbc.Tab(
-                                        label="Joint Plot 2",
-                                        tab_id="analysis_joint_2",
-                                    ),
-                                    dbc.Tab(
-                                        label="3D Plot",
-                                        tab_id="analysis_3d",
-                                    ),
-                                    dbc.Tab(
-                                        label="3D Contour Plot",
-                                        tab_id="analysis_3d_contour",
-                                    ),
-                                ],
-                                active_tab="analysis_line",
-                            ),
-                        ]
-                    ),
-                ],
-            ),
-            html.Br(),
-            # content: analysis & plot
-            html.Div(
-                style={"display": "flex"},
-                children=[
-                    html.Div(
-                        style={
-                            "width": "30%",
-                            "padding": "10px",
                         },
                         children=[
                             html.Div(id="analysis_tab_content_layout"),
                         ],
                     ),
-                    html.Div(
-                        style={
-                            "width": "70%",
-                            "padding": "10px",
-                        },
-                        children=[
-                            html.Div(id="analysis_tab_plot_layout"),
-                        ],
-                    ),
+                    # html.Div(
+                    #     style={
+                    #         "width": "30%",
+                    #         "padding": "10px",
+                    #     },
+                    #     # children=[
+                    #     #     html.Div(id="analysis_tab_plot_layout"),
+                    #     # ],
+                    # ),
                 ],
-            ),
-            html.Br(),
-            html.Br(),
-            # download and view code
-            html.Div(id="analysis_code"),
-        ]
-    )
+            )
+        ])
+        
 
     return layout
 
@@ -227,9 +220,7 @@ def analysis_layout():
 #######################################
 @my_app.callback(
     [
-        Output(
-            component_id="analysis_tab_content_layout", component_property="children"
-        ),
+        Output(component_id="analysis_tab_content_layout", component_property="children"),
         Output(component_id="analysis_tab_plot_layout", component_property="children"),
         Output(component_id="analysis_code", component_property="children"),
     ],
