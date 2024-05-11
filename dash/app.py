@@ -15,6 +15,7 @@ from components.interest_level_prediction import interest_level_prediction
 from components.price_prediction import price_prediction
 from components.virtual_assistant import virtual_assistant
 from components.listing import listing
+from components.heat_map import heat_map
 from components.alert_map import alert_map
 from components.about import about
 from components.overview import overview
@@ -79,6 +80,15 @@ sidebar = html.Div(
                         html.Span("Facilities Listing"),
                     ],
                     href="/listing",
+                    active="exact",
+                    className="sidebar-item"
+                ),
+                dbc.NavLink(
+                    [
+                        html.I(className="fas fa-fire me-2"),
+                        html.Span("Heat Map"),
+                    ],
+                    href="/heat_map",
                     active="exact",
                     className="sidebar-item"
                 ),
@@ -181,8 +191,8 @@ def render_page_content(pathname):
         return interest_level_prediction.interest_level_prediction_layout()
     elif pathname == "/price_prediction":
         return price_prediction.price_prediction_layout()
-    # elif pathname == "/gen_apartment":
-    #     pass
+    elif pathname == "/heat_map":
+        return heat_map.heatmap_layout()
     elif pathname == "/virtual_assistant":
         return virtual_assistant.virtual_assistant_layout()
     elif pathname == "/about":

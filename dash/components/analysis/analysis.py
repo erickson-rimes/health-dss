@@ -9,7 +9,7 @@ import dash_bootstrap_components as dbc
 # file imports
 from maindash import my_app
 from components.analysis.line_plot import line_plot_info
-from components.analysis.bar_plot_1 import bar_plot_1_info
+from components.analysis.bar_plot import bar_plot_info
 from components.analysis.bar_plot_2 import bar_plot_2_info
 from components.analysis.count_plot_1 import count_plot_1_info
 from components.analysis.count_plot_2 import count_plot_2_info
@@ -20,7 +20,7 @@ from components.analysis.count_plot_6 import count_plot_6_info
 from components.analysis.pie_chart import pie_chart_info
 from components.analysis.dist_plot import dist_plot_info
 from components.analysis.pair_plot import pair_plot_info
-from components.analysis.heatmap import heatmap_info
+from components.analysis.heatmap_info import heatmap_plot_info
 from components.analysis.qq_plot import qq_plot_info
 from components.analysis.reg_plot_1 import reg_plot_1_info
 from components.analysis.reg_plot_2 import reg_plot_2_info
@@ -55,21 +55,25 @@ def analysis_layout():
                                     id="analysis_selected_tab",
                                     children=[
                                         dbc.Tab(
+                                            label="Heatmap",
+                                            tab_id="analysis_heatmap",
+                                        ),
+                                        dbc.Tab(
                                             label="Line Plot",
                                             tab_id="analysis_line",
                                         ),
                                         dbc.Tab(
-                                            label="Bar Plot 1",
-                                            tab_id="analysis_bar_1",
+                                            label="Bar Plot",
+                                            tab_id="analysis_bar",
                                         ),
                                         # dbc.Tab(
                                         #     label="Bar Plot 2",
                                         #     tab_id="analysis_bar_2",
                                         # ),
-                                        dbc.Tab(
-                                            label="Count Plot 1",
-                                            tab_id="analysis_count_1",
-                                        ),
+                                        # dbc.Tab(
+                                        #     label="Count Plot 1",
+                                        #     tab_id="analysis_count_1",
+                                        # ),
                                         # dbc.Tab(
                                         #     label="Count Plot 2",
                                         #     tab_id="analysis_count_2",
@@ -90,30 +94,26 @@ def analysis_layout():
                                         #     label="Count Plot 6",
                                         #     tab_id="analysis_count_6",
                                         # ),
-                                        dbc.Tab(
-                                            label="Pie Chart",
-                                            tab_id="analysis_pie",
-                                        ),
-                                        dbc.Tab(
-                                            label="Dist Plot",
-                                            tab_id="analysis_dist",
-                                        ),
-                                        dbc.Tab(
-                                            label="Pair Plot",
-                                            tab_id="analysis_pair",
-                                        ),
-                                        dbc.Tab(
-                                            label="Heatmap",
-                                            tab_id="analysis_heatmap",
-                                        ),
-                                        dbc.Tab(
-                                            label="QQ Plot",
-                                            tab_id="analysis_qq",
-                                        ),
-                                        dbc.Tab(
-                                            label="Reg Plot 1",
-                                            tab_id="analysis_reg_1",
-                                        ),
+                                        # dbc.Tab(
+                                        #     label="Pie Chart",
+                                        #     tab_id="analysis_pie",
+                                        # ),
+                                        # dbc.Tab(
+                                        #     label="Dist Plot",
+                                        #     tab_id="analysis_dist",
+                                        # ),
+                                        # dbc.Tab(
+                                        #     label="Pair Plot",
+                                        #     tab_id="analysis_pair",
+                                        # ),
+                                        # dbc.Tab(
+                                        #     label="QQ Plot",
+                                        #     tab_id="analysis_qq",
+                                        # ),
+                                        # dbc.Tab(
+                                        #     label="Reg Plot 1",
+                                        #     tab_id="analysis_reg_1",
+                                        # ),
                                         # dbc.Tab(
                                         #     label="Reg Plot 2",
                                         #     tab_id="analysis_reg_2",
@@ -122,39 +122,37 @@ def analysis_layout():
                                         #     label="Reg Plot 3",
                                         #     tab_id="analysis_reg_3",
                                         # ),
-                                        dbc.Tab(
-                                            label="Area Plot",
-                                            tab_id="analysis_area",
-                                        ),
-                                        dbc.Tab(
-                                            label="Violin Plot",
-                                            tab_id="analysis_violin",
-                                        ),
-                                        dbc.Tab(
-                                            label="Joint Plot 1",
-                                            tab_id="analysis_joint_1",
-                                        ),
+                                        # dbc.Tab(
+                                        #     label="Area Plot",
+                                        #     tab_id="analysis_area",
+                                        # ),
+                                        # dbc.Tab(
+                                        #     label="Violin Plot",
+                                        #     tab_id="analysis_violin",
+                                        # ),
+                                        # dbc.Tab(
+                                        #     label="Joint Plot 1",
+                                        #     tab_id="analysis_joint_1",
+                                        # ),
                                         # dbc.Tab(
                                         #     label="Joint Plot 2",
                                         #     tab_id="analysis_joint_2",
                                         # ),
-                                        dbc.Tab(
-                                            label="3D Plot",
-                                            tab_id="analysis_3d",
-                                        ),
-                                        dbc.Tab(
-                                            label="3D Contour Plot",
-                                            tab_id="analysis_3d_contour",
-                                        ),
+                                        # dbc.Tab(
+                                        #     label="3D Plot",
+                                        #     tab_id="analysis_3d",
+                                        # ),
+                                        # dbc.Tab(
+                                        #     label="3D Contour Plot",
+                                        #     tab_id="analysis_3d_contour",
+                                        # ),
                                     ],
-                                    active_tab="analysis_line",
+                                    active_tab="analysis_heatmap",
                                 ),
                             ]
                         ),
                     ],
                 ),
-                html.Br(),
-                html.Br(),
                 html.Br(),
                 # content: analysis & plot
                 html.Div(
@@ -170,10 +168,11 @@ def analysis_layout():
                         #     ],
                         # ),
                         html.Div(
+                            # set background color to gray
                             style={
+                                "background-color": "#f9f9f9",
                                 "width": "100%",
                                 "height": "100%",
-                                "padding": "10px",
                             },
                             children=[
                                 html.Div(id="analysis_tab_plot_layout"),
@@ -237,8 +236,8 @@ def render_tab(tab_choice):
     """
     if tab_choice == "analysis_line":
         return line_plot_info()
-    if tab_choice == "analysis_bar_1":
-        return bar_plot_1_info()
+    if tab_choice == "analysis_bar":
+        return bar_plot_info()
     if tab_choice == "analysis_bar_2":
         return bar_plot_2_info()
     if tab_choice == "analysis_count_1":
@@ -260,7 +259,7 @@ def render_tab(tab_choice):
     if tab_choice == "analysis_pair":
         return pair_plot_info()
     if tab_choice == "analysis_heatmap":
-        return heatmap_info()
+        return heatmap_plot_info()
     if tab_choice == "analysis_qq":
         return qq_plot_info()
     if tab_choice == "analysis_reg_1":

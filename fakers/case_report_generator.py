@@ -17,9 +17,9 @@ def generate_case_report(gdf, faker):
             "latitude": coordinate.y,
             "longitude": coordinate.x
         },
-        "from": faker.date_time_between(start_date="-30d", end_date="-15d").isoformat(),
-        "to": faker.date_time_between(start_date="-14d", end_date="now").isoformat(),
-        "reportingDate": faker.date_time_between(start_date="-14d", end_date="now").isoformat(),
+        "from": faker.date_time_between(start_date="-365d", end_date="-335d").isoformat(),
+        "to": faker.date_time_between(start_date="-334d", end_date="now").isoformat(),
+        "reportingDate": faker.date_time_between(start_date="-334d", end_date="now").isoformat(),
         "reportingEntityType": random.choice(reporting_entity_types),
         "reportingEntityIdentifier": faker.bothify(text='???-######'),
         "administrativeLevel": random.choice([0, 1, 2, 3])

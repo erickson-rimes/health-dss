@@ -162,9 +162,9 @@ def update_graph(case_reports_data, plot_configuration, temporal_granularity, re
     elif plot_configuration == "cases_by_reporting_entity":
         fig = cases_by_reporting_entity(filtered_df, temporal_granularity, title, subtitle)
     elif plot_configuration == "cases_by_administrative_level":
-        fig = cases_by_administrative_level(filtered_df,  temporal_granularity)
-    elif plot_configuration == "lag_time_analysis":
-        fig = lag_time_analysis(filtered_df, temporal_granularity, title, subtitle)
+        fig = cases_by_administrative_level(filtered_df,  temporal_granularity, title, subtitle)
+    # elif plot_configuration == "lag_time_analysis":
+    #     fig = lag_time_analysis(filtered_df, temporal_granularity, title, subtitle)
     
     fig.update_layout(title_x=0.5)
 
@@ -193,7 +193,7 @@ def total_cases_over_time(filtered_df, temporal_granularity, title, subtitle):
     # group by date
     df_grouped = filtered_df.groupby(["date"]).agg({"numberOfCases": "sum"}).reset_index()
 
-    fig = px.line(df_grouped, x="date", y="numberOfCases", title=f"<b>{title}</b>{subtitle}", labels={"date": "Date", "numberOfCases": "Number of Cases"})
+    fig = px.line(df_grouped, x="date", y="numberOfCases", title=f"<b>{title}</b>{subtitle}", labels={"date": "Reporting Date", "numberOfCases": "Number of Cases"})
 
     return fig
 
@@ -208,7 +208,7 @@ def cases_by_type(filtered_df, temporal_granularity, title, subtitle):
     # group by date and case type
     df_grouped = filtered_df.groupby(["date", "caseType"]).agg({"numberOfCases": "sum"}).reset_index()
 
-    fig = px.line(df_grouped, x="date", y="numberOfCases", color="caseType", title=f"<b>{title}</b>{subtitle}", labels={"date": "Date", "numberOfCases": "Number of Cases", "caseType": "Case Type"})
+    fig = px.line(df_grouped, x="date", y="numberOfCases", color="caseType", title=f"<b>{title}</b>{subtitle}", labels={"date": "Reporting Date", "numberOfCases": "Number of Cases", "caseType": "Case Type"})
 
     return fig
 
@@ -224,7 +224,7 @@ def cases_by_reporting_entity(filtered_df, temporal_granularity, title, subtitle
     # group by date and case type
     df_grouped = filtered_df.groupby(["date", "reportingEntityType"]).agg({"numberOfCases": "sum"}).reset_index()
 
-    fig = px.line(df_grouped, x="date", y="numberOfCases", color="reportingEntityType", title=f"<b>{title}</b>{subtitle}", labels={"date": "Date", "numberOfCases": "Number of Cases", "reportingEntityType": "Reporting Entity Type"})
+    fig = px.line(df_grouped, x="date", y="numberOfCases", color="reportingEntityType", title=f"<b>{title}</b>{subtitle}", labels={"date": "Reporting Date", "numberOfCases": "Number of Cases", "reportingEntityType": "Reporting Entity Type"})
 
     return fig
 
@@ -241,7 +241,7 @@ def cases_by_administrative_level(filtered_df, temporal_granularity, title, subt
     # group by date and case type
     df_grouped = filtered_df.groupby(["date", "administrativeLevelText"]).agg({"numberOfCases": "sum"}).reset_index()
 
-    fig = px.line(df_grouped, x="date", y="numberOfCases", color="administrativeLevelText", title=f"<b>{title}</b>{subtitle}", labels={"date": "Date", "numberOfCases": "Number of Cases", "administrativeLevelText": "Administrative Level"})
+    fig = px.line(df_grouped, x="date", y="numberOfCases", color="administrativeLevelText", title=f"<b>{title}</b>{subtitle}", labels={"date": "Reporting Date", "numberOfCases": "Number of Cases", "administrativeLevelText": "Administrative Level"})
 
     return fig
 
@@ -304,7 +304,7 @@ def line_plot_content():
             html.Br(),
             dcc.DatePickerRange(
                 id="analysis_line_plot_date",
-                start_date=pd.to_datetime("2024-01-01"),
+                start_date=pd.to_datetime("2024-03-01"),
                 end_date=pd.to_datetime("2024-04-01"),
                 display_format="YYYY-MM-DD",
             ),

@@ -11,7 +11,7 @@ print(gdf.head())
 case_reports = []
 
 # generate 1000 case_reports
-for _ in range(1000):
+for _ in range(100000):
     case_report = generate_case_report(gdf, faker)  # Assuming generate_address takes gdf and faker as inputs
     case_reports.append(case_report)
 
@@ -19,4 +19,4 @@ for _ in range(1000):
 with open('case_reports.json', 'w') as f:
     json.dump(case_reports, f, ensure_ascii=False, indent=4)
 
-print("1000 case_reports generated and saved to case_reports.json")
+print("100000 case_reports generated and saved to case_reports.json")
