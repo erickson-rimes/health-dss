@@ -343,7 +343,7 @@ def bar_plot_content():
                     {"label": "Malaria Case", "value": "Malaria Case"},
                 ],
                 multi=True,
-                value=["Heat Stroke", "Dengue Case", "Malaria Case"],
+                value=["Malaria Case"],
             ),
             html.Br(),
             # choose reporting entity
