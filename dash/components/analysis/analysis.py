@@ -54,10 +54,10 @@ def analysis_layout():
                                 dbc.Tabs(
                                     id="analysis_selected_tab",
                                     children=[
-                                        dbc.Tab(
-                                            label="Heatmap",
-                                            tab_id="analysis_heatmap",
-                                        ),
+                                        # dbc.Tab(
+                                        #     label="Heatmap",
+                                        #     tab_id="analysis_heatmap",
+                                        # ),
                                         dbc.Tab(
                                             label="Line Plot",
                                             tab_id="analysis_line",
@@ -147,7 +147,7 @@ def analysis_layout():
                                         #     tab_id="analysis_3d_contour",
                                         # ),
                                     ],
-                                    active_tab="analysis_heatmap",
+                                    active_tab="analysis_line",
                                 ),
                             ]
                         ),

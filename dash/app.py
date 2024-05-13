@@ -56,21 +56,22 @@ sidebar = html.Div(
         # nav component
         dbc.Nav(
             [
-                dbc.NavLink(
-                    [
-                        html.I(className="fas fa-solid fa-star me-2"),
-                        html.Span("Overview"),
-                    ],
-                    href="/",
-                    active="exact",
-                    className="sidebar-item"
-                ),
+                # dbc.NavLink(
+                #     [
+                #         html.I(className="fas fa-solid fa-star me-2"),
+                #         html.Span("Overview"),
+                #     ],
+                #     href="/",
+                #     active="exact",
+                #     className="sidebar-item"
+                # ),
                 dbc.NavLink(
                     [
                         html.I(className="fas fa-solid fa-warning me-2"),
                         html.Span("Alerts"),
                     ],
-                    href="/alert_map",
+                    # href="/alert_map",
+                    href="/",
                     active="exact",
                     className="sidebar-item"
                 ),
@@ -101,15 +102,15 @@ sidebar = html.Div(
                     active="exact",
                     className="sidebar-item"
                 ),
-                dbc.NavLink(
-                    [
-                        html.I(className="fas fa-solid fa-sliders me-2"),
-                        html.Span("Data Visualization"),
-                    ],
-                    href="/visualization",
-                    active="exact",
-                    className="sidebar-item"
-                ),
+                # dbc.NavLink(
+                #     [
+                #         html.I(className="fas fa-solid fa-sliders me-2"),
+                #         html.Span("Data Visualization"),
+                #     ],
+                #     href="/visualization",
+                #     active="exact",
+                #     className="sidebar-item"
+                # ),
                 # dbc.NavLink(
                 #     [
                 #         html.I(className="fas fa-solid fa-people-group me-2"),
@@ -178,7 +179,8 @@ my_app.layout = html.Div(
 @my_app.callback(Output("page-content", "children"), [Input("url", "pathname")])
 def render_page_content(pathname):
     if pathname == "/":
-        return overview.overview_layout()
+        # return overview.overview_layout()
+        return alert_map.alert_map_layout()
     elif pathname == "/listing":
         return listing.listing_layout()
     elif pathname == '/alert_map':
