@@ -151,18 +151,18 @@ def left_side():
                         placeholder="Enter Municipality",
                     ),
                     html.Br(),
-                    html.Label("Sub-District", style={"fontWeight": "bold"}),
+                    html.Label("Administrative Post", style={"fontWeight": "bold"}),
                     dcc.Input(
-                        id="sub_district_filter",
+                        id="administrative_post_filter",
                         type="text",
-                        placeholder="Enter Sub-District",
+                        placeholder="Enter Administrative Post",
                     ),
                     html.Br(),
-                    html.Label("Village", style={"fontWeight": "bold"}),
+                    html.Label("Suco", style={"fontWeight": "bold"}),
                     dcc.Input(
-                        id="village_filter",
+                        id="suco_filter",
                         type="text",
-                        placeholder="Enter Village",
+                        placeholder="Enter Suco",
                     ),
                 ],
                 style={"display": "flex", "flexDirection": "column", "padding": "10px"},
@@ -212,12 +212,12 @@ def query_facilities(filters):
     if filters.get("municipality"):
         conditions.append("Address.municipality = ?")
         parameters.append(filters["municipality"])
-    if filters.get("subDistrict"):
-        conditions.append("Address.subDistrict = ?")
-        parameters.append(filters["subDistrict"])
-    if filters.get("village"):
-        conditions.append("Address.village = ?")
-        parameters.append(filters["village"])
+    if filters.get("administrativePost"):
+        conditions.append("Address.administrativePost = ?")
+        parameters.append(filters["administrativePost"])
+    if filters.get("suco"):
+        conditions.append("Address.suco = ?")
+        parameters.append(filters["suco"])
     
     # Handling service offerings as a special case
     if filters.get("serviceOfferings"):
@@ -300,20 +300,20 @@ def get_plotting_zoom_level_and_center_coordinates_from_lonlat(longitudes=None, 
         Input("accreditation_status_filter", "value"),
         Input("service_offerings_filter", "value"),
         Input("municipality_filter", "value"),
-        Input("sub_district_filter", "value"),
-        Input("village_filter", "value"),
+        Input("administrative_post_filter", "value"),
+        Input("suco_filter", "value"),
         # Assuming you have inputs for each of these filters in your Dash app
     ],
 )
-def update_facility_content(facilityType, ownership, accreditationStatus, serviceOfferings, municipality, subDistrict, village):
+def update_facility_content(facilityType, ownership, accreditationStatus, serviceOfferings, municipality, administrativePost, suco):
     filters = {
         "facilityType": facilityType if facilityType else None,
         "ownership": ownership if ownership else None,
         "accreditationStatus": accreditationStatus if accreditationStatus else None,
         "serviceOfferings": serviceOfferings if serviceOfferings else [],
         "municipality": municipality if municipality else None,
-        "subDistrict": subDistrict if subDistrict else None,
-        "village": village if village else None,
+        "administrativePost": administrativePost if administrativePost else None,
+        "suco": suco if suco else None,
     }
     print("Filters:", filters)
     filtered_df = query_facilities(filters)

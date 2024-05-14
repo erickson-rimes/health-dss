@@ -15,8 +15,8 @@ CREATE TABLE IF NOT EXISTS Address (
     id INTEGER PRIMARY KEY,
     addressLine TEXT,
     hamlet TEXT,
-    village TEXT,
-    subDistrict TEXT,
+    suco TEXT,
+    administrativePost TEXT,
     municipality TEXT,
     postalCode TEXT,
     latitude REAL,
@@ -41,12 +41,12 @@ for facility in facilities:
     # Insert address
     address = facility['address']
     cursor.execute('''
-    INSERT INTO Address (addressLine, hamlet, village, subDistrict, municipality, postalCode, latitude, longitude)
+    INSERT INTO Address (addressLine, hamlet, suco, administrativePost, municipality, postalCode, latitude, longitude)
     VALUES (?, ?, ?, ?, ?, ?, ?, ?)''', (
         address['addressLine'],
         address.get('hamlet'),
-        address.get('village'),
-        address['subDistrict'],
+        address.get('suco'),
+        address['administrativePost'],
         address['municipality'],
         address['postalCode'],
         address['gpsCoordinates']['latitude'],

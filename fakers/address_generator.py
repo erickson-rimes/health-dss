@@ -17,10 +17,10 @@ def generate_address(gdf, faker):
     address_line = faker.street_address()
     postal_code = generate_postal_code(random_row['ADM3_PCODE'])
 
-    # Extract municipality, sub-district, and village
+    # Extract municipality, administrative post, and suco
     municipality = random_row['ADM1_EN']
-    sub_district = random_row['ADM2_EN']
-    village = random_row['ADM3_EN']
+    administrative_post = random_row['ADM2_EN']
+    suco = random_row['ADM3_EN']
 
     # Extract latitude and longitude from the geometry
     point = random_row['geometry'].representative_point()
@@ -30,8 +30,8 @@ def generate_address(gdf, faker):
     address = {
         "addressLine": address_line,
         "hamlet": None,  # No data available for hamlets
-        "village": village,
-        "subDistrict": sub_district,
+        "suco": suco,
+        "administrativePost": administrative_post,
         "municipality": municipality,
         "postalCode": postal_code,
         "gpsCoordinates": {

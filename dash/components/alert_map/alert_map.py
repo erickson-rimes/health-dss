@@ -26,7 +26,8 @@ gdf_2 = gpd.read_file("../shapefiles/tls_admbnda_adm2_who_ocha_20200911.shp")
 gdf_1 = gpd.read_file("../shapefiles/tls_admbnda_adm1_who_ocha_20200911.shp")
 gdf_0 = gpd.read_file("../shapefiles/tls_admbnda_adm0_who_ocha_20200911.shp")
 
-# print(gdf.columns)
+# print(gdf_3.columns)
+# print(gdf_3.head())
 
 
 # Ensure the GeoDataFrame is using a coordinate system that matches your alert coordinates (usually WGS84, EPSG:4326)
@@ -185,9 +186,9 @@ def left_side():
                         id="administrative_level_filter",
                         options=[
                             {"label": "Country", "value": 0},
-                            {"label": "State", "value": 1},
-                            {"label": "District", "value": 2},
-                            {"label": "City", "value": 3},
+                            {"label": "Municipality", "value": 1},
+                            {"label": "Administrative Post", "value": 2},
+                            {"label": "Suco", "value": 3},
                         ],
                         value=[],
                         placeholder="Select Administrative Level(s)",
@@ -421,6 +422,31 @@ def update_map_based_on_hover(hoverData, fig, admin_regions):
         # This assumes admin_regions is a GeoDataFrame with a 'geometry' column of Polygon geometries
         joined = gpd.sjoin(admin_regions, hover_point_gdf, how='inner', op='contains')
 
+        adm3_en_value = None
+        adm2_en_value = None
+        adm1_en_value = None
+        adm0_en_value = None
+
+        if 'ADM3_EN' in joined.columns:
+            adm3_en_value = joined['ADM3_EN'].values[0] if not joined.empty else None
+        
+        if 'ADM2_EN' in joined.columns:
+            adm2_en_value = joined['ADM2_EN'].values[0] if not joined.empty else None
+
+        if 'ADM1_EN' in joined.columns:
+            adm1_en_value = joined['ADM1_EN'].values[0] if not joined.empty else None
+
+        if 'ADM0_EN' in joined.columns:
+            adm0_en_value = joined['ADM0_EN'].values[0] if not joined.empty else None
+
+        print (f"ADM3: {adm3_en_value}, ADM2: {adm2_en_value}, ADM1: {adm1_en_value}, ADM0: {adm0_en_value}")
+
+        # join the adm_en_value in a single string
+        # Do not include if value is None
+        joined_en_values = ', '.join(filter(None, [adm3_en_value, adm2_en_value, adm1_en_value, adm0_en_value]))
+
+    
+
         if not joined.empty:
             adm_level = hoverData['points'][0]['customdata'][2]
             column_name = f'ADM{adm_level}_PCODE'
@@ -448,8 +474,21 @@ def update_map_based_on_hover(hoverData, fig, admin_regions):
                 showscale=False,
                 marker_opacity=0.5,
                 marker_line_width=1,  # Increase line width for highlighting
-                marker_line_color='gold'  # Change color to highlight; adjust as needed
+                marker_line_color='gold',  # Change color to highlight; adjust as needed
             )
+
+            fig.add_annotation(
+                text=joined_en_values,  # Text to display
+                xref="paper", yref="paper",
+                x=0.01, y=0.99,  # Positioning: (0,0) is bottom left, (1,1) is top right
+                showarrow=False,
+                font=dict(size=14, color="white"),  # White font color
+                align="left",
+                bgcolor="black",  # Background color (black) to act as border
+                bordercolor="black",  # Border color (black)
+                borderwidth=2  # Border width
+            )
+
 
             fig.add_trace(new_trace)
 
@@ -467,6 +506,10 @@ def create_map_figure(filtered_df):
 
     # Create column "severityTitle" to display the severity as a string
     filtered_df["severityTitle"] = filtered_df["severity"].map({0: "Low", 1: "Moderate", 2: "High", 3: "Critical"})
+
+    # Get the name of the country, municipality, administrative post, or suco based on the administrative level
+
+
 
 
     fig = px.scatter_mapbox(
@@ -612,9 +655,9 @@ def capture_zoom_state(relayoutData, current_zoom_state):
 #         alert_type = row.get('alertType', 'Unknown').replace('_', ' ').title()
 #         administrative_level = {
 #             0: "Country",
-#             1: "State",
-#             2: "District",
-#             3: "City",
+#             1: "Municipality",
+#             2: "Administrative Post",
+#             3: "Suco",
 #         }.get(row.get("administrativeLevel", 0), "Unknown")
 
 #         card_content = [

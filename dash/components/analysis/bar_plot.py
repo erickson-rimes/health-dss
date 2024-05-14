@@ -251,13 +251,13 @@ def cases_by_reporting_entity(filtered_df, title, subtitle):
 
 # e. Cases by Administrative Level Over Time
 # X-axis: Time (fromDateTime or reportingDate)
-# Y-axis: Number of cases, segmented by administrativeLevel (e.g., Country, State, District, City)
+# Y-axis: Number of cases, segmented by administrativeLevel (e.g., Country, Municipality, Administrative Post, Suco)
 # Purpose: Observe how case trends differ across various administrative levels, which could indicate localized outbreaks or spread.
 def cases_by_administrative_level(filtered_df, title, subtitle):
     # create date columns based on the value of temporal granularity
     # create_date_columns(filtered_df, temporal_granularity)
 
-    filtered_df["administrativeLevelText"] = filtered_df["administrativeLevel"].map({0: "Country", 1: "State", 2: "District", 3: "City"})
+    filtered_df["administrativeLevelText"] = filtered_df["administrativeLevel"].map({0: "Country", 1: "Municipality", 2: "Administrative Post", 3: "Suco"})
 
     df_grouped = filtered_df.groupby(["caseType", "administrativeLevelText"]).agg({"numberOfCases": "sum"}).reset_index()
 
