@@ -308,7 +308,7 @@ def heatmap(filtered_df, temporal_granularity, title, subtitle):
 
 # b. Cases by Type Over Time
 # X-axis: Time (fromDateTime or reportingDate)
-# Y-axis: Number of cases, segmented by caseType (e.g., Heat Stroke, Dengue Case, Malaria Case)
+# Y-axis: Number of cases, segmented by caseType (e.g., Heat Stroke, Dengue Case, Diarrhea Case)
 # Purpose: Compare trends across different types of cases to identify patterns or outbreaks.
 def cases_by_type(filtered_df, temporal_granularity, title, subtitle):
     # create date columns based on the value of temporal granularity
@@ -346,7 +346,7 @@ def cases_by_reporting_entity(filtered_df, temporal_granularity, title, subtitle
     df_grouped = filtered_df.groupby(["date", "latitude", "longitude", "caseType", "reportingEntityType"]).agg({"numberOfCases": "sum"}).reset_index()
 
     # create a heatmap plot grouped by reporting entity type
-    fig = px.density_mapbox(df_grouped,  range_color=[df_grouped["numberOfCases"].min(), df_grouped["numberOfCases"].max()], animation_frame="date", animation_group="numberOfCases",  color_continuous_scale=px.colors.sequential.OrRd, height=800, lat="latitude", lon="longitude", z="numberOfCases", category_orders={"caseType": ["Heat Stroke", "Dengue Case", "Malaria Case"]}, title=f"<b>{title}</b>{subtitle}", zoom=zoom, center={"lat": center_lat, "lon": center_lon},
+    fig = px.density_mapbox(df_grouped,  range_color=[df_grouped["numberOfCases"].min(), df_grouped["numberOfCases"].max()], animation_frame="date", animation_group="numberOfCases",  color_continuous_scale=px.colors.sequential.OrRd, height=800, lat="latitude", lon="longitude", z="numberOfCases", category_orders={"caseType": ["Heat Stroke", "Dengue Case", "Diarrhea Case"]}, title=f"<b>{title}</b>{subtitle}", zoom=zoom, center={"lat": center_lat, "lon": center_lon},
         mapbox_style="open-street-map", labels={"numberOfCases": "Number of Cases", "reportingEntityType": "Reporting Entity Type", "caseType": "Case Type"})
 
     # fig.update_layout(heatmapmode="group")
@@ -367,7 +367,7 @@ def cases_by_administrative_level(filtered_df, temporal_granularity, title, subt
     df_grouped = filtered_df.groupby(["date", "latitude", "longitude", "caseType", "administrativeLevelText"]).agg({"numberOfCases": "sum"}).reset_index()
 
     # create a heatmap plot grouped by reporting entity type
-    fig = px.density_mapbox(df_grouped,  range_color=[df_grouped["numberOfCases"].min(), df_grouped["numberOfCases"].max()], animation_frame="date", animation_group="numberOfCases",  color_continuous_scale=px.colors.sequential.OrRd, height=800, lat="latitude", lon="longitude", z="numberOfCases", category_orders={"caseType": ["Heat Stroke", "Dengue Case", "Malaria Case"]}, title=f"<b>{title}</b>{subtitle}", zoom=zoom, center={"lat": center_lat, "lon": center_lon},
+    fig = px.density_mapbox(df_grouped,  range_color=[df_grouped["numberOfCases"].min(), df_grouped["numberOfCases"].max()], animation_frame="date", animation_group="numberOfCases",  color_continuous_scale=px.colors.sequential.OrRd, height=800, lat="latitude", lon="longitude", z="numberOfCases", category_orders={"caseType": ["Heat Stroke", "Dengue Case", "Diarrhea Case"]}, title=f"<b>{title}</b>{subtitle}", zoom=zoom, center={"lat": center_lat, "lon": center_lon},
         mapbox_style="open-street-map", labels={"numberOfCases": "Number of Cases", "administrativeLevelText": "Reporting Entity Type", "caseType": "Case Type"})
 
     # fig.update_layout(heatmapmode="group")
@@ -446,10 +446,10 @@ def heatmap_plot_content():
                 options=[
                     {"label": "Heat Stroke", "value": "Heat Stroke"},
                     {"label": "Dengue Case", "value": "Dengue Case"},
-                    {"label": "Malaria Case", "value": "Malaria Case"},
+                    {"label": "Diarrhea Case", "value": "Diarrhea Case"},
                 ],
                 multi=True,
-                value=["Malaria Case"],
+                value=["Diarrhea Case"],
             ),
             html.Br(),
             # choose reporting entity

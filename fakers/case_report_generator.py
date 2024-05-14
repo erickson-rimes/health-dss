@@ -7,7 +7,7 @@ def generate_case_report(gdf, faker):
     coordinate = random_row['geometry'].representative_point()
     
     # Generate random data for the case report
-    case_types = ["Heat Stroke", "Dengue Case", "Malaria Case"]
+    case_types = ["Heat Stroke", "Dengue Case", "Diarrhea Case"]
     reporting_entity_types = ["Individual", "Health Facility", "Automated System"]
     
     case_report = {

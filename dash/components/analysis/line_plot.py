@@ -199,7 +199,7 @@ def total_cases_over_time(filtered_df, temporal_granularity, title, subtitle):
 
 # b. Cases by Type Over Time
 # X-axis: Time (fromDateTime or reportingDate)
-# Y-axis: Number of cases, segmented by caseType (e.g., Heat Stroke, Dengue Case, Malaria Case)
+# Y-axis: Number of cases, segmented by caseType (e.g., Heat Stroke, Dengue Case, Diarrhea Case)
 # Purpose: Compare trends across different types of cases to identify patterns or outbreaks.
 def cases_by_type(filtered_df, temporal_granularity, title, subtitle):
     # create date columns based on the value of temporal granularity
@@ -317,10 +317,10 @@ def line_plot_content():
                 options=[
                     {"label": "Heat Stroke", "value": "Heat Stroke"},
                     {"label": "Dengue Case", "value": "Dengue Case"},
-                    {"label": "Malaria Case", "value": "Malaria Case"},
+                    {"label": "Diarrhea Case", "value": "Diarrhea Case"},
                 ],
                 multi=True,
-                value=["Malaria Case"],
+                value=["Diarrhea Case"],
             ),
             html.Br(),
             # choose reporting entity

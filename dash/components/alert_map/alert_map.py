@@ -159,7 +159,7 @@ def left_side():
                             {"label": "Extreme Cold", "value": "Extreme Cold"},
                             {"label": "Heat Stroke Cases", "value": "Heat Stroke Cases"},
                             {"label": "Dengue Case", "value": "Dengue Case"},
-                            {"label": "Malaria Case", "value": "Malaria Case"},
+                            {"label": "Diarrhea Case", "value": "Diarrhea Case"},
                         ],
                         value=[],
                         placeholder="Select Alert Type(s)",
@@ -507,7 +507,7 @@ def create_map_figure(filtered_df):
 #         'Extreme Cold': '❄',  # Snowflake symbol
 #         'Heat Stroke Case': '😓',  # Face with sweat
 #         'Dengue Case': '🦟',  # Mosquito (where supported, otherwise consider a simple dot or cross)
-#         'Malaria Case': '⚕',  # Medical symbol
+#         'Diarrhea Case': '⚕',  # Medical symbol
 #     }
 
 #     # Initialize a figure

@@ -10,7 +10,7 @@ def generate_alert(gdf, faker):
     coordinate = random_row['geometry'].representative_point()
     
     # Generate random data for the alert
-    alert_type = random.choice(["Extreme Heat", "Extreme Cold", "Heat Stroke Cases", "Dengue Case", "Malaria Case"])
+    alert_type = random.choice(["Extreme Heat", "Extreme Cold", "Heat Stroke Cases", "Dengue Case", "Diarrhea Case"])
     location = {
         "latitude": coordinate.y,
         "longitude": coordinate.x

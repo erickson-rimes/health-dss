@@ -215,7 +215,7 @@ def total_cases_over_time(filtered_df, title, subtitle):
 
 # b. Cases by Type Over Time
 # X-axis: Time (fromDateTime or reportingDate)
-# Y-axis: Number of cases, segmented by caseType (e.g., Heat Stroke, Dengue Case, Malaria Case)
+# Y-axis: Number of cases, segmented by caseType (e.g., Heat Stroke, Dengue Case, Diarrhea Case)
 # Purpose: Compare trends across different types of cases to identify patterns or outbreaks.
 def cases_by_type(filtered_df, title, subtitle):
     # create date columns based on the value of temporal granularity
@@ -243,7 +243,7 @@ def cases_by_reporting_entity(filtered_df, title, subtitle):
     df_grouped = filtered_df.groupby(["caseType", "reportingEntityType"]).agg({"numberOfCases": "sum"}).reset_index()
 
     # create a bar plot grouped by reporting entity type
-    fig = px.bar(df_grouped, x="reportingEntityType", y="numberOfCases", color="caseType", category_orders={"caseType": ["Heat Stroke", "Dengue Case", "Malaria Case"]}, title=f"<b>{title}</b>{subtitle}", labels={"numberOfCases": "Number of Cases", "reportingEntityType": "Reporting Entity Type", "caseType": "Case Type"})
+    fig = px.bar(df_grouped, x="reportingEntityType", y="numberOfCases", color="caseType", category_orders={"caseType": ["Heat Stroke", "Dengue Case", "Diarrhea Case"]}, title=f"<b>{title}</b>{subtitle}", labels={"numberOfCases": "Number of Cases", "reportingEntityType": "Reporting Entity Type", "caseType": "Case Type"})
 
     fig.update_layout(barmode="group")
 
@@ -262,7 +262,7 @@ def cases_by_administrative_level(filtered_df, title, subtitle):
     df_grouped = filtered_df.groupby(["caseType", "administrativeLevelText"]).agg({"numberOfCases": "sum"}).reset_index()
 
     # create a bar plot grouped by reporting entity type
-    fig = px.bar(df_grouped, x="administrativeLevelText", y="numberOfCases", color="caseType", category_orders={"caseType": ["Heat Stroke", "Dengue Case", "Malaria Case"]}, title=f"<b>{title}</b>{subtitle}", labels={"numberOfCases": "Number of Cases", "administrativeLevelText": "Reporting Entity Type", "caseType": "Case Type"})
+    fig = px.bar(df_grouped, x="administrativeLevelText", y="numberOfCases", color="caseType", category_orders={"caseType": ["Heat Stroke", "Dengue Case", "Diarrhea Case"]}, title=f"<b>{title}</b>{subtitle}", labels={"numberOfCases": "Number of Cases", "administrativeLevelText": "Reporting Entity Type", "caseType": "Case Type"})
 
     fig.update_layout(barmode="group")
 
@@ -340,10 +340,10 @@ def bar_plot_content():
                 options=[
                     {"label": "Heat Stroke", "value": "Heat Stroke"},
                     {"label": "Dengue Case", "value": "Dengue Case"},
-                    {"label": "Malaria Case", "value": "Malaria Case"},
+                    {"label": "Diarrhea Case", "value": "Diarrhea Case"},
                 ],
                 multi=True,
-                value=["Malaria Case"],
+                value=["Diarrhea Case"],
             ),
             html.Br(),
             # choose reporting entity
