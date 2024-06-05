@@ -22,6 +22,14 @@ CREATE TABLE IF NOT EXISTS case_reports (
     reportingDate TEXT,
     reportingEntityType TEXT,
     reportingEntityIdentifier TEXT,
+    sexGroupMaleCases INTEGER,
+    sexGroupFemaleCases INTEGER,
+    sexGroupUnknownCases INTEGER,
+    ageGroup0To4Cases INTEGER,
+    ageGroup5To18Cases INTEGER,
+    ageGroup19To59Cases INTEGER,
+    ageGroup60PlusCases INTEGER,
+    ageGroupUnknownCases INTEGER,
     administrativeLevel INTEGER
 )
 ''')
@@ -30,8 +38,8 @@ CREATE TABLE IF NOT EXISTS case_reports (
 # Function to insert a case report JSON object into the SQLite table
 def insert_case_report(json_obj):
     c.execute('''
-    INSERT INTO case_reports (caseType, numberOfCases, latitude, longitude, fromDateTime, toDateTime, reportingDate, reportingEntityType, reportingEntityIdentifier, administrativeLevel)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    INSERT INTO case_reports (caseType, numberOfCases, latitude, longitude, fromDateTime, toDateTime, reportingDate, reportingEntityType, reportingEntityIdentifier, sexGroupMaleCases, sexGroupFemaleCases, sexGroupUnknownCases, ageGroup0To4Cases, ageGroup5To18Cases, ageGroup19To59Cases, ageGroup60PlusCases, ageGroupUnknownCases,  administrativeLevel)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     ''', (
         json_obj['caseType'],
         json_obj['numberOfCases'],
@@ -42,6 +50,14 @@ def insert_case_report(json_obj):
         json_obj['reportingDate'],
         json_obj['reportingEntityType'],
         json_obj['reportingEntityIdentifier'],
+        json_obj['sexGroupMaleCases'],
+        json_obj['sexGroupFemaleCases'],
+        json_obj['sexGroupUnknownCases'],
+        json_obj['ageGroup0To4Cases'],
+        json_obj['ageGroup5To18Cases'],
+        json_obj['ageGroup19To59Cases'],
+        json_obj['ageGroup60PlusCases'],
+        json_obj['ageGroupUnknownCases'],
         json_obj['administrativeLevel']
     ))
 
