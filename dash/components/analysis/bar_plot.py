@@ -47,7 +47,17 @@ def bar_plot_layout():
             dcc.Store(id="bar-case-reports-store"),
             dcc.Loading(
                 children=[
-                    
+                    dcc.Dropdown(
+                        id='bar-plot-mode-dropdown',
+                        options=[
+                            {'label': 'Group', 'value': 'group'},
+                            {'label': 'Stack', 'value': 'stack'},
+                            {'label': 'Overlay', 'value': 'overlay'},
+                            {'label': 'Relative', 'value': 'relative'}
+                        ],
+                        value="group",
+                        placeholder="Select a bar plot mode",
+                    ),
                     # temporal granularity picker
                     dcc.Graph(id="bar_graph"),
                 ],
@@ -120,7 +130,7 @@ def query_case_reports(filters):
     [
         Input("bar-case-reports-store", "data"),
         Input("bar-plot-config-dropdown", "value"),
-        # Input("bar-plot-temporal-granularity-dropdown", "value"),
+        Input("bar-plot-mode-dropdown", "value"),
         Input("bar_plot_reporting_entity_filter", "value"),
         Input("bar_plot_case_type_filter", "value"),
     ],
@@ -132,7 +142,7 @@ def query_case_reports(filters):
 def update_graph(
     case_reports_data, 
     plot_configuration, 
-    # temporal_granularity, 
+    bar_plot_mode,
     bar_plot_reporting_entity_filter, 
     bar_plot_case_type_filter, 
     start_date, 
@@ -159,6 +169,10 @@ def update_graph(
         title += "Cases by Reporting Entity"
     elif plot_configuration == "cases_by_administrative_level":
         title += "Cases by Administrative Level"
+    elif plot_configuration == "cases_by_age_group":
+        title += "Cases by Age Group"
+    elif plot_configuration == "cases_by_sex_group":
+        title += "Cases by Sex Group"
 
     # Put the date range in the title in the format YYYY-MM-DD
     start_date_str = pd.to_datetime(start_date).strftime("%Y-%m-%d")
@@ -179,10 +193,14 @@ def update_graph(
         fig = cases_by_reporting_entity(filtered_df, title, subtitle)
     elif plot_configuration == "cases_by_administrative_level":
         fig = cases_by_administrative_level(filtered_df, title, subtitle)
+    elif plot_configuration == "cases_by_age_group":
+        fig = cases_by_age_group(filtered_df, title, subtitle)
+    elif plot_configuration == "cases_by_sex_group":
+        fig = cases_by_sex_group(filtered_df, title, subtitle)
     # elif plot_configuration == "lag_time_analysis":
     #     fig = lag_time_analysis(filtered_df, title, subtitle)
     
-    fig.update_layout(title_x=0.5)
+    fig.update_layout(title_x=0.5, barmode=bar_plot_mode)
 
     return fig
 
@@ -245,8 +263,6 @@ def cases_by_reporting_entity(filtered_df, title, subtitle):
     # create a bar plot grouped by reporting entity type
     fig = px.bar(df_grouped, x="reportingEntityType", y="numberOfCases", color="caseType", category_orders={"caseType": ["Heat Stroke", "Dengue Case", "Diarrhea Case"]}, title=f"<b>{title}</b>{subtitle}", labels={"numberOfCases": "Number of Cases", "reportingEntityType": "Reporting Entity Type", "caseType": "Case Type"})
 
-    fig.update_layout(barmode="group")
-
     return fig
 
 # e. Cases by Administrative Level Over Time
@@ -264,7 +280,46 @@ def cases_by_administrative_level(filtered_df, title, subtitle):
     # create a bar plot grouped by reporting entity type
     fig = px.bar(df_grouped, x="administrativeLevelText", y="numberOfCases", color="caseType", category_orders={"caseType": ["Heat Stroke", "Dengue Case", "Diarrhea Case"]}, title=f"<b>{title}</b>{subtitle}", labels={"numberOfCases": "Number of Cases", "administrativeLevelText": "Reporting Entity Type", "caseType": "Case Type"})
 
-    fig.update_layout(barmode="group")
+    return fig
+
+def cases_by_age_group(filtered_df, title, subtitle):
+    # Prepare data for plotting
+    age_groups = ['ageGroup0To4Cases', 'ageGroup5To18Cases', 'ageGroup19To59Cases', 'ageGroup60PlusCases', 'ageGroupUnknownCases']
+
+    # Melt the DataFrame to have a single column for age groups
+    df_melted = filtered_df.melt(id_vars=['caseType'], value_vars=age_groups, var_name='Age Group', value_name='Number of Cases')
+
+    # Rename age groups for better readability
+    df_melted['Age Group'] = df_melted['Age Group'].str.replace('ageGroup', '').str.replace('Cases', '')
+
+    df_grouped = df_melted.groupby(["caseType", "Age Group"]).agg({"Number of Cases": "sum"}).reset_index()
+
+    # print(df_melted.head())
+
+    # Plotting using Plotly
+    fig = px.bar(df_grouped, x='caseType', y='Number of Cases', color='Age Group',
+                title=f"<b>{title}</b>{subtitle}",
+                labels={'caseType': 'Case Type', 'Number of Cases': 'Number of Cases', 'Age Group': 'Age Group'})
+
+    return fig
+
+
+def cases_by_sex_group(filtered_df, title, subtitle):
+    # Prepare data for plotting
+    sex_groups = ['sexGroupMaleCases', 'sexGroupFemaleCases', 'sexGroupUnknownCases']
+
+    # Melt the DataFrame to have a single column for sex groups
+    df_melted = filtered_df.melt(id_vars=['caseType'], value_vars=sex_groups, var_name='Sex Group', value_name='Number of Cases')
+
+    # Rename sex groups for better readability
+    df_melted['Sex Group'] = df_melted['Sex Group'].str.replace('sexGroup', '').str.replace('Cases', '')
+
+    df_grouped = df_melted.groupby(["caseType", "Sex Group"]).agg({"Number of Cases": "sum"}).reset_index()
+
+    # Plotting using Plotly
+    fig = px.bar(df_grouped, x='caseType', y='Number of Cases', color='Sex Group', 
+                title=f"<b>{title}</b>{subtitle}",
+                labels={'caseType': 'Case Type', 'Number of Cases': 'Number of Cases', 'Sex Group': 'Sex Group'})
 
     return fig
 
@@ -303,6 +358,8 @@ def bar_plot_content():
                     {'label': 'Cases by Type', 'value': 'cases_by_type'},
                     {'label': 'Cases by Reporting Entity', 'value': 'cases_by_reporting_entity'},
                     {'label': 'Cases by Administrative Level', 'value': 'cases_by_administrative_level'},
+                    {'label': 'Cases by Age Group', 'value': 'cases_by_age_group'},
+                    {'label': 'Cases by Sex Group', 'value': 'cases_by_sex_group'},
                     # {'label': 'Lag Time Analysis', 'value': 'lag_time_analysis'},
                     # {'label': 'Average Cases per Reporting Entity', 'value': 'average_cases_per_reporting_entity'},
                 ],

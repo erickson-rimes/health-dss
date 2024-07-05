@@ -74,3 +74,10 @@ define your domain name.
 7. Now, create the ingress, and select your workload. Activate 1 pod to initialize and run
 your application.
 8. Your application has been successfully deployed!
+
+### Feature TODOs
+- Information dissemination and announcement / advisory creator with templates
+- Public interface for public users
+- Ability to call third-party apps (gmail, docs, editors, etc) 
+- Language support
+

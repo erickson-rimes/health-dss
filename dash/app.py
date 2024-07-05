@@ -19,6 +19,7 @@ from components.heat_map import heat_map
 from components.alert_map import alert_map
 from components.about import about
 from components.overview import overview
+from components.advisories import advisories_feed
 
 #######################################
 # Initial Settings 
@@ -56,22 +57,21 @@ sidebar = html.Div(
         # nav component
         dbc.Nav(
             [
-                # dbc.NavLink(
-                #     [
-                #         html.I(className="fas fa-solid fa-star me-2"),
-                #         html.Span("Overview"),
-                #     ],
-                #     href="/",
-                #     active="exact",
-                #     className="sidebar-item"
-                # ),
+                dbc.NavLink(
+                    [
+                        html.I(className="fas fa-solid fa-newspaper me-2"),
+                        html.Span("Advisories"),
+                    ],
+                    href="/",
+                    active="exact",
+                    className="sidebar-item"
+                ),
                 dbc.NavLink(
                     [
                         html.I(className="fas fa-solid fa-warning me-2"),
                         html.Span("Alerts"),
                     ],
-                    # href="/alert_map",
-                    href="/",
+                    href="/alert_map",
                     active="exact",
                     className="sidebar-item"
                 ),
@@ -179,6 +179,8 @@ my_app.layout = html.Div(
 @my_app.callback(Output("page-content", "children"), [Input("url", "pathname")])
 def render_page_content(pathname):
     if pathname == "/":
+        return advisories_feed.advisories_layout()
+    elif pathname == "/alert_map":
         # return overview.overview_layout()
         return alert_map.alert_map_layout()
     elif pathname == "/listing":
