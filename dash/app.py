@@ -122,7 +122,7 @@ def display_user_info(pathname):
 
 # Display user info callback
 @my_app.callback(
-    Output('user-dropdown', 'label'),
+    Output('user-dropdown', 'children'),
     [Input('url', 'pathname')]
 )
 def display_user_info(pathname):
