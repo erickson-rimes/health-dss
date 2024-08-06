@@ -119,6 +119,8 @@ def load_more_advisories(n_clicks, new_advisory_data, current_children):
         if row["title"] is not None:
             title = row["title"]
 
+        content_preview = ""
+
         if len(content) > 150:
             content_preview = content[:150] + "..."
 
