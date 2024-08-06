@@ -48,7 +48,8 @@ services:
       KC_DB_PASSWORD: "password"
       KEYCLOAK_ADMIN: "admin"
       KEYCLOAK_ADMIN_PASSWORD: "admin"
-      KC_HTTP_ENABLED: "false"
+      KC_HTTP_ENABLED: "true"
+      KC_HOSTNAME_STRICT_HTTPS: "false"
       JAVA_OPTS_APPEND: "-Dkeycloak.profile.feature.upload_scripts=enabled"
     ports:
       - 8051:8080
