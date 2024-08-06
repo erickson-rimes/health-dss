@@ -1,0 +1,67 @@
+version: '3.1'
+
+volumes:
+  postgres_data:
+    driver: local
+    driver_opts:
+      o: bind
+      type: none
+      device: ./dev/postgres_data
+  # nginx_conf:
+  #   external: 
+  #     name: ./dev/nginx_conf
+  # nginx_certs:
+  #   external:
+  #     name: ./dev/nginx_certs
+
+services:
+
+  iam_db:
+    image: postgres
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=keycloak
+    ports:
+      - 8052:5432
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - ./postgres_data:/var/lib/postgresql/data
+    networks:
+      - crish-network
+
+  iam:
+    depends_on:
+      - iam_db
+    image: quay.io/keycloak/keycloak:17.0.1 
+    environment:
+      KC_DB: "postgres"
+      KC_DB_URL_HOST: "iam_db"
+      KC_DB_URL_DATABASE: "keycloak"
+      KC_DB_SCHEMA: "public"
+      KC_DB_USERNAME: "postgres"
+      KC_DB_PASSWORD: "password"
+      KEYCLOAK_ADMIN: "admin"
+      KEYCLOAK_ADMIN_PASSWORD: "admin"
+      KC_HTTP_ENABLED: "false"
+      JAVA_OPTS_APPEND: "-Dkeycloak.profile.feature.upload_scripts=enabled"
+    ports:
+      - 8051:8080
+    healthcheck:
+      test: curl --fail -s http://localhost:8051 || exit 1
+      start_period: 30s
+      interval: 15s
+      timeout: 15s
+      retries: 5
+    command: start-dev
+    networks:
+      - crish-network
+
+networks:
+  crish-network:
+    external: true

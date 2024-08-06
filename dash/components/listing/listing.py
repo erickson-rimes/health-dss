@@ -102,7 +102,7 @@ def left_side():
                             {"label": "Diagnostic Lab", "value": "diagnostic_lab"},
                             {"label": "Other", "value": "other"},
                         ],
-                        value=[],  # Use an empty list as the default value for multiple selections
+                        value=["hospital"],  # Use an empty list as the default value for multiple selections
                         placeholder="Select Facility Type(s)",
                         multi=True,
                     ),

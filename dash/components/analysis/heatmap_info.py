@@ -275,12 +275,6 @@ def heatmap(filtered_df, temporal_granularity, title, subtitle):
     # group by case type and sum up the number of cases
     df_grouped = filtered_df.groupby(["date", "latitude", "longitude"]).agg({"numberOfCases": "sum"}).reset_index()
 
-    print("filtered_df columns: ")
-    print(filtered_df.columns)
-
-    print("df_grouped columns: ")
-    print(df_grouped.columns)
-
     # create a heatmap plot grouped by case type
     fig = px.density_mapbox(
         df_grouped,  
@@ -315,12 +309,6 @@ def cases_by_type(filtered_df, temporal_granularity, title, subtitle):
 
     # group by case type and sum up the number of cases
     df_grouped = filtered_df.groupby(["date", "latitude", "longitude", "caseType"]).agg({"numberOfCases": "sum"}).reset_index()
-
-    print("filtered_df columns: ")
-    print(filtered_df.columns)
-
-    print("df_grouped columns: ")
-    print(df_grouped.columns)
 
     # create a heatmap plot grouped by case type
     fig = px.density_mapbox(df_grouped,  range_color=[df_grouped["numberOfCases"].min(), df_grouped["numberOfCases"].max()], animation_frame="date", animation_group="numberOfCases",  color_continuous_scale=px.colors.sequential.OrRd, height=800, lat="latitude", lon="longitude", z="numberOfCases", title=f"<b>{title}</b>{subtitle}", zoom=zoom,

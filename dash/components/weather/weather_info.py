@@ -16,8 +16,17 @@ from maindash import my_app
 from maindash import df
 from utils.file_operation import read_file_as_str
 import re
+import json
+import geopandas as gpd
 
-id_prefix="heatmap456"
+# Load GeoJSON data
+with open('wrf_T2_L12.json') as f:
+    geojson_data = json.load(f)
+
+with open('data_contourf_Q2_L12.json') as f:
+    humidity_contour = json.load(f)
+
+id_prefix="weather456"
 
 def get_plotting_zoom_level_and_center_coordinates_from_lonlat(longitudes=None, latitudes=None):
     """Function documentation:\n
@@ -69,35 +78,36 @@ def get_plotting_zoom_level_and_center_coordinates_from_lonlat(longitudes=None, 
     # Finally, return the zoom level and the associated boundary-box center coordinates
     return zoom, b_box['center']
 
-def heatmap_plot_layout():
+def weather_layout():
     layout = html.Div(
-        [
+        children = [
             dcc.Store(id=id_prefix+"heatmap-case-reports-store"),
             dcc.Loading(
                 children=[
                     # temporal granularity picker
-                    dcc.Graph(id=id_prefix+"heatmap_graph"),
+                    dcc.Graph(id=id_prefix+"heatmap_graph", style={'height': '85vh'}),
                 ],
             )
-        ]
+        ],
+        # style={'height': '100%', "background-color": "green"}
     )
     return layout
 
 @my_app.callback(
     Output(component_id=id_prefix+"heatmap-case-reports-store", component_property="data"),
     [
-        Input(component_id=id_prefix+"analysis_heatmap_plot_date", component_property="start_date"),
-        Input(component_id=id_prefix+"analysis_heatmap_plot_date", component_property="end_date"),
-        Input(component_id=id_prefix+"heatmap_plot_case_type_filter", component_property="value"),
-        Input(component_id=id_prefix+"heatmap_plot_reporting_entity_filter", component_property="value")
+        Input(component_id=id_prefix+"weather_date", component_property="start_date"),
+        Input(component_id=id_prefix+"weather_date", component_property="end_date"),
+        Input(component_id=id_prefix+"weather_case_type_filter", component_property="value"),
+        Input(component_id=id_prefix+"weather_reporting_entity_filter", component_property="value")
     ]
 )
-def update_case_reports_store(start_date, end_date, heatmap_plot_case_type_filter, heatmap_plot_reporting_entity_filter):
+def update_case_reports_store(start_date, end_date, weather_case_type_filter, weather_reporting_entity_filter):
     filters = {
         "start_date": start_date,
         "end_date": end_date,
-        "heatmap_plot_case_type_filter": heatmap_plot_case_type_filter if heatmap_plot_case_type_filter else "",
-        "heatmap_plot_reporting_entity_filter": heatmap_plot_reporting_entity_filter if heatmap_plot_reporting_entity_filter else ""
+        "weather_case_type_filter": weather_case_type_filter if weather_case_type_filter else "",
+        "weather_reporting_entity_filter": weather_reporting_entity_filter if weather_reporting_entity_filter else ""
     }
 
     filtered_df = query_case_reports(filters)
@@ -126,13 +136,13 @@ def query_case_reports(filters):
         conditions.append("reportingDate <= ?")
         params.append(filters["end_date"])
 
-    if filters["heatmap_plot_case_type_filter"]:
-        conditions.append("caseType IN ({})".format(", ".join(["?"] * len(filters["heatmap_plot_case_type_filter"]))))
-        params.extend(filters["heatmap_plot_case_type_filter"])
+    if filters["weather_case_type_filter"]:
+        conditions.append("caseType IN ({})".format(", ".join(["?"] * len(filters["weather_case_type_filter"]))))
+        params.extend(filters["weather_case_type_filter"])
 
-    if filters["heatmap_plot_reporting_entity_filter"]:
-        conditions.append("reportingEntityType IN ({})".format(", ".join(["?"] * len(filters["heatmap_plot_reporting_entity_filter"]))))
-        params.extend(filters["heatmap_plot_reporting_entity_filter"])
+    if filters["weather_reporting_entity_filter"]:
+        conditions.append("reportingEntityType IN ({})".format(", ".join(["?"] * len(filters["weather_reporting_entity_filter"]))))
+        params.extend(filters["weather_reporting_entity_filter"])
 
     if conditions:
         base_query += " WHERE " + " AND ".join(conditions)
@@ -146,22 +156,22 @@ def query_case_reports(filters):
     Output(component_id=id_prefix+"heatmap_graph", component_property="figure"),
     [
         Input(component_id=id_prefix+"heatmap-case-reports-store", component_property="data"),
-        # Input(component_id=id_prefix+"heatmap-plot-config-dropdown", "value"),
+        Input(component_id=id_prefix+"heatmap-plot-config-dropdown", component_property="value"),
         Input(component_id=id_prefix+"heatmap-plot-temporal-granularity-dropdown", component_property="value"),
-        Input(component_id=id_prefix+"heatmap_plot_reporting_entity_filter", component_property="value"),
-        Input(component_id=id_prefix+"heatmap_plot_case_type_filter", component_property="value"),
+        Input(component_id=id_prefix+"weather_reporting_entity_filter", component_property="value"),
+        Input(component_id=id_prefix+"weather_case_type_filter", component_property="value"),
     ],
     [
-        State(component_id=id_prefix+"analysis_heatmap_plot_date", component_property="start_date"),
-        State(component_id=id_prefix+"analysis_heatmap_plot_date", component_property="end_date"),
+        State(component_id=id_prefix+"weather_date", component_property="start_date"),
+        State(component_id=id_prefix+"weather_date", component_property="end_date"),
     ]
 )
 def update_graph(
     case_reports_data, 
-    # plot_configuration, 
+    plot_configuration, 
     temporal_granularity, 
-    heatmap_plot_reporting_entity_filter, 
-    heatmap_plot_case_type_filter, 
+    weather_reporting_entity_filter, 
+    weather_case_type_filter, 
     start_date, 
     end_date):
     filtered_df = pd.read_json(case_reports_data, orient='split')
@@ -194,9 +204,9 @@ def update_graph(
 
     # Create a subtitle based from the case type filter
     subtitle = ""
-    if heatmap_plot_case_type_filter:
-        subtitle = "<br><sub>Case Types: " + ", ".join(heatmap_plot_case_type_filter) + "</sub>" + \
-            "<br><sup>Reporting Entities: " + ", ".join(heatmap_plot_reporting_entity_filter) + "</sup>"
+    if weather_case_type_filter:
+        subtitle = "<br><sub>Case Types: " + ", ".join(weather_case_type_filter) + "</sub>" + \
+            "<br><sup>Reporting Entities: " + ", ".join(weather_reporting_entity_filter) + "</sup>"
 
     # if plot_configuration == "total_cases_over_time":
     #     fig = total_cases_over_time(filtered_df, temporal_granularity, title, subtitle)
@@ -211,9 +221,16 @@ def update_graph(
     
     # fig.update_layout(title_x=0.5)
 
-    fig = heatmap(filtered_df, temporal_granularity, title, subtitle)
+    if plot_configuration == "temperature":
+        fig = temperature(filtered_df, temporal_granularity, title, subtitle)
+    elif plot_configuration == "humidity":
+        fig = humidity(filtered_df, temporal_granularity, title, subtitle)
 
-    
+    fig.update_layout(
+        # autosize=True,
+        margin={"r":0,"t":0,"l":0,"b":0},
+        # height=None  # Allowing height to be adjusted automatically based on parent container
+    )
 
     return fig
 
@@ -244,33 +261,95 @@ def total_cases_over_time(filtered_df, temporal_granularity, title, subtitle):
 
     return fig
 
-def heatmap(filtered_df, temporal_granularity, title, subtitle):
+def temperature(filtered_df, temporal_granularity, title, subtitle):
     create_date_columns(filtered_df, temporal_granularity)
     zoom, (center_lat, center_lon) = get_plotting_zoom_level_and_center_coordinates_from_lonlat(filtered_df['longitude'], filtered_df['latitude'])
 
     # group by case type and sum up the number of cases
     df_grouped = filtered_df.groupby(["date", "latitude", "longitude"]).agg({"numberOfCases": "sum"}).reset_index()
 
-    # create a heatmap plot grouped by case type
-    fig = px.density_mapbox(
-        df_grouped,  
-        range_color=[df_grouped["numberOfCases"].min(), 
-                     df_grouped["numberOfCases"].max()], 
-        animation_frame="date", 
-        animation_group="numberOfCases",  
-        color_continuous_scale=px.colors.sequential.OrRd, 
-        height=800, 
-        lat="latitude", 
-        lon="longitude", 
-        z="numberOfCases", 
-        title=f"<b>{title}</b>{subtitle}", 
+    # Extract features
+    features = geojson_data['features']
+
+    # Extract unique temperature ranges and create a mapping to numerical values
+    unique_titles = list(set(feature['properties']['title'] for feature in features))
+    unique_titles.sort()  # Ensure the titles are sorted to maintain order
+    title_to_value = {title: i for i, title in enumerate(unique_titles)}
+
+    # Add mapped values to each feature
+    for feature in features:
+        feature['properties']['value'] = title_to_value[feature['properties']['title']]
+        
+    # Define a custom blue-to-red color scale
+    color_scale = [
+        [0.0, 'blue'],
+        [0.25, 'cyan'],
+        [0.5, 'green'],
+        [0.75, 'yellow'],
+        [1.0, 'red']
+    ]
+
+    # Generate a Plotly figure with the GeoJSON data
+    fig = px.choropleth_mapbox(
+        geojson_data,
+        geojson=geojson_data,
+        locations=[i for i in range(len(features))],
+        featureidkey="properties.value",
+        color=[feature['properties']['value'] for feature in features],
+        color_continuous_scale=color_scale,
+        mapbox_style="carto-positron",
         zoom=zoom,
         center={"lat": center_lat, "lon": center_lon},
-        mapbox_style="open-street-map", 
-        # mapbox_style="carto-positron",
-        labels={"numberOfCases": "Number of Cases", "caseType": "Case Type"}
-        )
-    
+        opacity=0.5,
+        labels={'value': 'Temperature (K)'},
+        # height=800
+    )
+
+    return fig
+
+def humidity(filtered_df, temporal_granularity, title, subtitle):
+    create_date_columns(filtered_df, temporal_granularity)
+    zoom, (center_lat, center_lon) = get_plotting_zoom_level_and_center_coordinates_from_lonlat(filtered_df['longitude'], filtered_df['latitude'])
+
+    # group by case type and sum up the number of cases
+    df_grouped = filtered_df.groupby(["date", "latitude", "longitude"]).agg({"numberOfCases": "sum"}).reset_index()
+
+    # Extract features
+    features = humidity_contour['features']
+
+    # Extract unique temperature ranges and create a mapping to numerical values
+    unique_titles = list(set(feature['properties']['title'] for feature in features))
+    unique_titles.sort()  # Ensure the titles are sorted to maintain order
+    title_to_value = {title: i for i, title in enumerate(unique_titles)}
+
+    # Add mapped values to each feature
+    for feature in features:
+        feature['properties']['value'] = title_to_value[feature['properties']['title']]
+        
+    # Define a custom blue-to-red color scale
+    color_scale = [
+        [0.0, 'blue'],
+        [0.25, 'cyan'],
+        [0.5, 'green'],
+        [0.75, 'yellow'],
+        [1.0, 'red']
+    ]
+
+    # Generate a Plotly figure with the GeoJSON data
+    fig = px.choropleth_mapbox(
+        humidity_contour,
+        geojson=humidity_contour,
+        locations=[i for i in range(len(features))],
+        featureidkey="properties.value",
+        color=[feature['properties']['value'] for feature in features],
+        color_continuous_scale=color_scale,
+        mapbox_style="carto-positron",
+        zoom=zoom,
+        center={"lat": center_lat, "lon": center_lon},
+        opacity=0.5,
+        labels={'value': 'Humidity (g/kg)'},
+    )
+
     return fig
 
 
@@ -285,6 +364,12 @@ def cases_by_type(filtered_df, temporal_granularity, title, subtitle):
 
     # group by case type and sum up the number of cases
     df_grouped = filtered_df.groupby(["date", "latitude", "longitude", "caseType"]).agg({"numberOfCases": "sum"}).reset_index()
+
+    print("filtered_df columns: ")
+    print(filtered_df.columns)
+
+    print("df_grouped columns: ")
+    print(df_grouped.columns)
 
     # create a heatmap plot grouped by case type
     fig = px.density_mapbox(df_grouped,  range_color=[df_grouped["numberOfCases"].min(), df_grouped["numberOfCases"].max()], animation_frame="date", animation_group="numberOfCases",  color_continuous_scale=px.colors.sequential.OrRd, height=800, lat="latitude", lon="longitude", z="numberOfCases", title=f"<b>{title}</b>{subtitle}", zoom=zoom,
@@ -351,32 +436,32 @@ def cases_by_administrative_level(filtered_df, temporal_granularity, title, subt
 
 #     return fig
 
-def heatmap_plot_content():
+def weather_content():
     return html.Div(
-        [
-            html.Div([html.H3("Heatmap Plot")]),
-            html.Div(
-                [
-                    html.P(
-                        "A heat map (or heatmap) is a 2-dimensional data visualization technique that represents the magnitude of individual values within a dataset as a color."
-                    )
-                ]
-            ),
-            html.Br(),
-            html.H4("Configuration"),
-            # html.Label("Analysis", style={"fontWeight": "bold"}),
-            # dcc.Dropdown(
-            #     id=id_prefix+'heatmap-plot-config-dropdown',
-            #     options=[
-            #         {'label': 'Cases by Type', 'value': 'cases_by_type'},
-            #         {'label': 'Cases by Reporting Entity', 'value': 'cases_by_reporting_entity'},
-            #         {'label': 'Cases by Administrative Level', 'value': 'cases_by_administrative_level'},
-            #         # {'label': 'Lag Time Analysis', 'value': 'lag_time_analysis'},
-            #         # {'label': 'Average Cases per Reporting Entity', 'value': 'average_cases_per_reporting_entity'},
-            #     ],
-            #     value="cases_by_type",
-            #     placeholder="Select a plot configuration",
+        children = [
+            # html.Div([html.H3("Weather Module")]),
+            # html.Div(
+            #     [
+            #         html.P(
+            #             "A heat map (or heatmap) is a 2-dimensional data visualization technique that represents the magnitude of individual values within a dataset as a color."
+            #         )
+            #     ]
             # ),
+            # html.Br(),
+            html.H4("Configuration"),
+            html.Label("Parameter", style={"fontWeight": "bold"}),
+            dcc.Dropdown(
+                id=id_prefix+'heatmap-plot-config-dropdown',
+                options=[
+                    {'label': 'Temperature', 'value': 'temperature'},
+                    {'label': 'Humidity', 'value': 'humidity'},
+                    {'label': 'Rainfall', 'value': 'cases_by_administrative_level'},
+                    # {'label': 'Lag Time Analysis', 'value': 'lag_time_analysis'},
+                    # {'label': 'Average Cases per Reporting Entity', 'value': 'average_cases_per_reporting_entity'},
+                ],
+                value="temperature",
+                placeholder="Select a plot configuration",
+            ),
             # html.Br(),
             html.Label("Granularity", style={"fontWeight": "bold"}),
             dcc.Dropdown(
@@ -394,7 +479,7 @@ def heatmap_plot_content():
             html.Label("Date Range", style={"fontWeight": "bold", "width": "100%"}),
             html.Br(),
             dcc.DatePickerRange(
-                id=id_prefix+"analysis_heatmap_plot_date",
+                id=id_prefix+"weather_date",
                 start_date=pd.to_datetime("2024-03-01"),
                 end_date=pd.to_datetime("2024-04-01"),
                 display_format="YYYY-MM-DD",
@@ -404,7 +489,7 @@ def heatmap_plot_content():
             # choose case type
             html.Label("Case Type", style={"fontWeight": "bold"}),
             dcc.Dropdown(
-                id=id_prefix+"heatmap_plot_case_type_filter",
+                id=id_prefix+"weather_case_type_filter",
                 options=[
                     {"label": "Heat Stroke", "value": "Heat Stroke"},
                     {"label": "Dengue Case", "value": "Dengue Case"},
@@ -417,7 +502,7 @@ def heatmap_plot_content():
             # choose reporting entity
             html.Label("Reporting Entity", style={"fontWeight": "bold"}),
             dcc.Dropdown(
-                id=id_prefix+"heatmap_plot_reporting_entity_filter",
+                id=id_prefix+"weather_reporting_entity_filter",
                 options=[
                     {"label": "Individual", "value": "Individual"},
                     {"label": "Health Facility", "value": "Health Facility"},
@@ -432,7 +517,10 @@ def heatmap_plot_content():
             # Add a download button to save the heatmap-case-reports-store as csv
             # align the button to the right
             dbc.Button("Download as .CSV", id=id_prefix+"heatmap-plot-download-data", color="primary", style={"width": "100%"}),
-            dcc.Download(id=id_prefix+'heatmap-plot-download-csv')     
+            dcc.Download(id=id_prefix+'heatmap-plot-download-csv'),    
+            html.Br(),
+            html.Br(),
+            html.Br(), 
         ]
     )
 
@@ -447,7 +535,7 @@ def download_data(n_clicks, case_reports_data):
     filtered_df = pd.read_json(case_reports_data, orient='split')
     return dcc.send_data_frame(filtered_df.to_csv, "case-reports.csv", index=False)
 
-def heatmap_plot_code():
+def weather_code():
     return html.Div(
         [
             html.H3("💻 Source Code"),
@@ -456,7 +544,7 @@ def heatmap_plot_code():
                 [
                     dbc.Button(
                         "View Code",
-                        id=id_prefix+"analysis_heatmap_plot_collapse_button",
+                        id=id_prefix+"weather_collapse_button",
                         className="mb-3",
                         color="primary",
                         n_clicks=0,
@@ -468,7 +556,7 @@ def heatmap_plot_code():
                             ),
                             mathjax=True,
                         ),
-                        id=id_prefix+"analysis_heatmap_plot_collapse",
+                        id=id_prefix+"weather_collapse",
                         is_open=False,
                     ),
                 ]
@@ -477,36 +565,36 @@ def heatmap_plot_code():
                 "Download Code",
                 color="success",
                 className="me-1",
-                id=id_prefix+"analysis_heatmap_plot_download_btn",
+                id=id_prefix+"weather_download_btn",
             ),
-            dcc.Download(id=id_prefix+"analysis_heatmap_plot_download"),
+            dcc.Download(id=id_prefix+"weather_download"),
         ]
     )
 
 
 @my_app.callback(
-    Output(component_id=id_prefix+"analysis_heatmap_plot_download", component_property="data"),
-    Input(component_id=id_prefix+"analysis_heatmap_plot_download_btn", component_property="n_clicks"),
+    Output(component_id=id_prefix+"weather_download", component_property="data"),
+    Input(component_id=id_prefix+"weather_download_btn", component_property="n_clicks"),
     prevent_initial_call=True,
 )
 def func(n_clicks):
-    return dcc.send_file("./utils/download_codes/analysis/heatmap_plot_code.py")
+    return dcc.send_file("./utils/download_codes/analysis/weather_code.py")
 
 
-def heatmap_plot_info():
+def weather_info():
 
     # make the html div hidden
     return (
-        heatmap_plot_content(),
-        heatmap_plot_layout(),
-        heatmap_plot_code()
+        weather_content(),
+        weather_layout(),
+        weather_code()
     )
 
 
 @my_app.callback(
-    Output(component_id=id_prefix+"analysis_heatmap_plot_collapse", component_property="is_open"),
-    [Input(component_id=id_prefix+"analysis_heatmap_plot_collapse_button", component_property="n_clicks")],
-    [State(component_id=id_prefix+"analysis_heatmap_plot_collapse", component_property="is_open")],
+    Output(component_id=id_prefix+"weather_collapse", component_property="is_open"),
+    [Input(component_id=id_prefix+"weather_collapse_button", component_property="n_clicks")],
+    [State(component_id=id_prefix+"weather_collapse", component_property="is_open")],
 )
 def toggle_collapse(n, is_open):
     if n:

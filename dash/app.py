@@ -1,13 +1,5 @@
-# dash imports
-import dash
-from dash import html
-from dash import Input
-from dash import Output
-from dash import dcc
-import dash_bootstrap_components as dbc
-
 # file imports
-from maindash import my_app
+from maindash import my_app, blueprint, server, is_authenticated, keycloak_openid
 from components.overview import overview
 from components.analysis import analysis
 from components.visualization import visualization
@@ -18,175 +10,141 @@ from components.listing import listing
 from components.heat_map import heat_map
 from components.alert_map import alert_map
 from components.about import about
-from components.overview import overview
 from components.advisories import advisories_feed
+from components.weather import weather
+import dash
+from dash import html, dcc, Input, Output
+import dash_bootstrap_components as dbc
 
-#######################################
-# Initial Settings 
-#######################################
-server = my_app.server
-
-CONTENT_STYLE = {
-    "transition": "margin-left .1s",
-    # "padding": "1rem 1rem",
-}
-
-#######################################
-# Layout
-########################################
 sidebar = html.Div(
     [
         html.Div(
-            # [
-            #     # html.I(className="fas fa-home"),
-            #     html.H2(my_app.title, style={"color": "white"}),
-            # ],
-            
             html.Div(
-                    [
-                        html.I(className="fas fa-solid fa-virus px-2 fa-2xl mr-4", style={"color": "white"}),
-                        html.Span(my_app.title, style={"color": "white", "fontSize": "2rem"}),
-                    ],
-                    style={"display": "flex", "align-items": "center"},
-                ),
+                [
+                    html.I(className="fas fa-solid fa-virus px-2 fa-2xl mr-4", style={"color": "white"}),
+                    html.Span(my_app.title, style={"color": "white", "fontSize": "2rem"}),
+                ],
+                style={"display": "flex", "align-items": "center"},
+            ),
             className="sidebar-header",
         ),
         html.Br(),
-        # html.Div(style={"border-top": "2px solid white"}),
         html.Br(),
-        # nav component
         dbc.Nav(
             [
-                dbc.NavLink(
-                    [
-                        html.I(className="fas fa-solid fa-newspaper me-2"),
-                        html.Span("Advisories"),
-                    ],
-                    href="/",
-                    active="exact",
-                    className="sidebar-item"
-                ),
-                dbc.NavLink(
-                    [
-                        html.I(className="fas fa-solid fa-warning me-2"),
-                        html.Span("Alerts"),
-                    ],
-                    href="/alert_map",
-                    active="exact",
-                    className="sidebar-item"
-                ),
-                dbc.NavLink(
-                    [
-                        html.I(className="fas fa-home me-2"),
-                        html.Span("Facilities Listing"),
-                    ],
-                    href="/listing",
-                    active="exact",
-                    className="sidebar-item"
-                ),
-                dbc.NavLink(
-                    [
-                        html.I(className="fas fa-fire me-2"),
-                        html.Span("Heat Map"),
-                    ],
-                    href="/heat_map",
-                    active="exact",
-                    className="sidebar-item"
-                ),
-                dbc.NavLink(
-                    [
-                        html.I(className="fas fa-solid fa-chart-simple me-2"),
-                        html.Span("Data Analysis"),
-                    ],
-                    href="/analysis",
-                    active="exact",
-                    className="sidebar-item"
-                ),
-                # dbc.NavLink(
-                #     [
-                #         html.I(className="fas fa-solid fa-sliders me-2"),
-                #         html.Span("Data Visualization"),
+                dbc.NavLink([html.I(className="fas fa-solid fa-newspaper me-2"), html.Span("Advisories")],
+                            href="/", active="exact", className="sidebar-item"),
+                dbc.NavLink([html.I(className="fas fa-solid fa-warning me-2"), html.Span("Alerts")],
+                            href="/alert_map", active="exact", className="sidebar-item"),
+                dbc.NavLink([html.I(className="fas fa-home me-2"), html.Span("Facilities Listing")],
+                            href="/listing", active="exact", className="sidebar-item"),
+                dbc.NavLink([html.I(className="fas fa-fire me-2"), html.Span("Heat Map")],
+                            href="/heat_map", active="exact", className="sidebar-item"),
+                dbc.NavLink([html.I(className="fas fa-cloud me-2"), html.Span("Weather")],
+                            href="/weather", active="exact", className="sidebar-item"),
+                dbc.NavLink([html.I(className="fas fa-solid fa-chart-simple me-2"), html.Span("Data Analysis")],
+                            href="/analysis", active="exact", className="sidebar-item"),
+                # dbc.DropdownMenu(
+                #     id="user-dropdown",
+                #     children=[
+                #         dbc.DropdownMenuItem("Settings", href="/settings"),
+                #         dbc.DropdownMenuItem("Logout", href="/logout"),
                 #     ],
-                #     href="/visualization",
-                #     active="exact",
-                #     className="sidebar-item"
-                # ),
-                # dbc.NavLink(
-                #     [
-                #         html.I(className="fas fa-solid fa-people-group me-2"),
-                #         html.Span("Interest Level Prediction"),
-                #     ],
-                #     href="/interest_level_prediction",
-                #     active="exact",
-                # ),
-                # dbc.NavLink(
-                #     [
-                #         html.I(className="fas fa-solid fa-arrow-trend-up me-2"),
-                #         html.Span("Rental Cost Prediction"),
-                #     ],
-                #     href="/price_prediction",
-                #     active="exact",
-                # ),
-                # dbc.NavLink(
-                #     [
-                #         html.I(className="fas fa-solid fa-eye me-2"),
-                #         html.Span("Generative Apartment"),
-                #     ],
-                #     href="/gen_apartment",
-                #     active="exact",
-                # ),
-                # dbc.NavLink(
-                #     [
-                #         html.I(className="fas fa-solid fa-comments me-2"),
-                #         html.Span("Virtual Assistant"),
-                #     ],
-                #     href="/virtual_assistant",
-                #     active="exact",
-                # ),
-                # dbc.NavLink(
-                #     [
-                #         html.I(className="fas fa-solid fa-code me-2"),
-                #         html.Span("About"),
-                #     ],
-                #     href="/about",
-                #     active="exact",
-                # ),
+                #     nav=True,
+                #     className="sidebar-item",
+                #     label=[
+                #         html.I(className="fas fa-user-alt me-2"),
+                #         html.Span("Not logged in")
+                #     ],  # Default label with logo
+                # )
             ],
             vertical=True,
             pills=True,
+        ),
+        dbc.Nav(
+            [
+                dbc.NavItem(
+                    dbc.DropdownMenu(
+                        children=[
+                            dbc.DropdownMenuItem("Settings", href="/settings"),
+                            dbc.DropdownMenuItem("Logout", href="/logout"),
+                        ],
+                        nav=True,
+                        in_navbar=True,
+                        className="sidebar-item",
+                        label=[
+                            html.I(className="fas fa-user-alt me-2"),
+                            html.Span("Not logged in", id="user-dropdown")
+                        ],  # Default label with logo
+                    ),
+                ),
+               
+            ],
+            vertical=True,
+            pills=True,
+            # className="user-menu-nav",
+            style={"position": "absolute", "bottom": "12px"},
         ),
     ],
     className="sidebar",
 )
 
-
+# Main app layout
 my_app.layout = html.Div(
     [
         dcc.Location(id="url"),
         sidebar,
+        # html.H1('Hello, Keycloak Authenticated User!'),
+        html.Div(id='user-info', style={"display": "none"}),
         html.Div(
             [
                 dash.page_container,
             ],
             className="content",
-            style=CONTENT_STYLE,
+            style={"transition": "margin-left .1s"},
             id="page-content",
         ),
     ]
 )
 
+# Display user info callback
+@my_app.callback(
+    Output('user-info', 'children'),
+    [Input('url', 'pathname')]
+)
+def display_user_info(pathname):
+    if is_authenticated():
+        # print(blueprint.session)
+        token = blueprint.session.token["access_token"]
+        userinfo = keycloak_openid.userinfo(token)
+        return f"Logged in as: {userinfo['preferred_username']}"
+    return "Not logged in"
 
+# Display user info callback
+@my_app.callback(
+    Output('user-dropdown', 'label'),
+    [Input('url', 'pathname')]
+)
+def display_user_info(pathname):
+    if is_authenticated():
+        # print(blueprint.session)
+        token = blueprint.session.token["access_token"]
+        userinfo = keycloak_openid.userinfo(token)
+        return userinfo['preferred_username']
+    return "Not logged in"
+
+# Render page content callback
 @my_app.callback(Output("page-content", "children"), [Input("url", "pathname")])
 def render_page_content(pathname):
+    # print(pathname)
     if pathname == "/":
         return advisories_feed.advisories_layout()
     elif pathname == "/alert_map":
-        # return overview.overview_layout()
         return alert_map.alert_map_layout()
+    elif pathname == "/weather":
+        return weather.weather_layout()
     elif pathname == "/listing":
         return listing.listing_layout()
-    elif pathname == '/alert_map':
-        return alert_map.alert_map_layout()
     elif pathname == "/analysis":
         return analysis.analysis_layout()
     elif pathname == "/visualization":
@@ -201,31 +159,20 @@ def render_page_content(pathname):
         return virtual_assistant.virtual_assistant_layout()
     elif pathname == "/about":
         return about.about_layout()
+    # elif pathname == "/logout":
+    #     logout()
     return dbc.Container(
         children=[
-            html.H1(
-                "404 Error: Page Not found",
-                style={"textAlign": "center", "color": "#082446"},
-            ),
+            html.H1("404 Error: Page Not found", style={"textAlign": "center", "color": "#082446"}),
             html.Br(),
-            html.P(
-                f"Oh no! The pathname '{pathname}' was not recognised...",
-                style={"textAlign": "center"},
-            ),
-            # image
+            html.P(f"Oh no! The pathname '{pathname}' was not recognised...", style={"textAlign": "center"}),
             html.Div(
                 style={"display": "flex", "justifyContent": "center"},
-                children=[
-                    html.Img(
-                        src="https://elephant.art/wp-content/uploads/2020/02/gu_announcement_01-1.jpg",
-                        alt="hokie",
-                        style={"width": "400px"},
-                    ),
-                ],
+                children=[html.Img(src="https://elephant.art/wp-content/uploads/2020/02/gu_announcement_01-1.jpg", alt="hokie", style={"width": "400px"})],
             ),
         ]
     )
 
-
+# Run the app
 if __name__ == "__main__":
     my_app.run_server(debug=True, host="0.0.0.0", port=80)

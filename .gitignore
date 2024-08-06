@@ -5,3 +5,4 @@ data/sentimental_extraction_kaggle.json
 # Python cache files
 **/__pycache__/
 *.py[cod]
+iam/postgres_data

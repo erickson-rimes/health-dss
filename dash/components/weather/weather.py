@@ -9,20 +9,20 @@ import dash_bootstrap_components as dbc
 # file imports
 from maindash import my_app
 
-from components.heat_map.heatmap_info import heatmap_plot_info
+from components.weather.weather_info import weather_info
 
-id_prefix="heatmap123"
+id_prefix="weather123"
 
 #######################################
 # Layout
 #######################################
-def heatmap_layout():
+def weather_layout():
     layout = html.Div(
             # split horizontally
-        style={"display": "flex"},
+        style={"display": "flex", "height": "100vh"},
         children = [
             html.Div(
-                style={"width": "75%", "padding": "12px"},
+                style={"width": "75%", "height": "100%","padding": "12px", "background-color": "#f9f9f9"},
                 children=
                 [
                 html.Div(
@@ -35,11 +35,11 @@ def heatmap_layout():
                                     id=id_prefix+"analysis_selected_tab",
                                     children=[
                                         dbc.Tab(
-                                            label="Heatmap",
-                                            tab_id=id_prefix+"analysis_heatmap",
+                                            label="Weather",
+                                            tab_id=id_prefix+"weather",
                                         ),
                                     ],
-                                    active_tab=id_prefix+"analysis_heatmap",
+                                    active_tab=id_prefix+"weather",
                                 ),
                             ]
                         ),
@@ -78,12 +78,12 @@ def heatmap_layout():
                 html.Div(id=id_prefix+"analysis_code", style={"display": "none"}),
             ]), 
             html.Div(
-                style={"display": "flex", "width": "25%", "padding": "12px"},
+                style={"display": "flex", "width": "25%", "padding": "12px", "height": "100%", "overflowY": "scroll"},
                 children=[
                     html.Div(
-                        style={
-                            "width": "100%",
-                        },
+                        # style={
+                        #     "width": "100%",
+                        # },
                         children=[
                             html.Div(id=id_prefix+"analysis_tab_content_layout"),
                         ],
@@ -125,4 +125,4 @@ def render_tab(tab_choice):
     Returns:
         selected subtab's layout
     """
-    return heatmap_plot_info()
+    return weather_info()

@@ -15,6 +15,7 @@ from shapely.geometry import Point
 from dash.exceptions import PreventUpdate
 from . import timeline
 from dateutil import parser
+from datetime import date
 
 from maindash import my_app
 
@@ -200,8 +201,8 @@ def left_side():
                         id="time_range_filter",
                         start_date_placeholder_text="Start Date",
                         end_date_placeholder_text="End Date",
-                        start_date=None,  # Optional: Set an initial start date
-                        end_date=None,  # Optional: Set an initial end date
+                        start_date=date(2024,5,13),  # Optional: Set an initial start date
+                        end_date=date.today(),  # Optional: Set an initial end date
                         min_date_allowed=None,  # Optional: Set the earliest selectable date
                         max_date_allowed=None,  # Optional: Set the latest selectable date
                     ),
@@ -222,7 +223,7 @@ def left_side():
 #         ]
 #     )
 
-def query_alerts(filters):
+def query_alerts(filters, offset=0, limit=10):
     con = sqlite3.connect("alerts.db")  # Connect to the alerts database
 
     # Base query
@@ -251,13 +252,14 @@ def query_alerts(filters):
         conditions.append("time BETWEEN ? AND ?")
         parameters.extend([filters["timeRange"]["start"], filters["timeRange"]["end"]])
 
+    
+
     # Construct the final query
     if conditions:
         query = base_query + " WHERE " + " AND ".join(conditions)
     else:
         query = base_query  # No filters applied
 
-    
     # Executing the query
     df = pd.read_sql_query(query, con, params=parameters)
 
