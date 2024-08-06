@@ -1,7 +1,6 @@
 import dash
 import dash_bootstrap_components as dbc
 import pandas as pd
-
 from flask import Flask, redirect, request, url_for, session
 from flask_session import Session
 from flask_sqlalchemy import SQLAlchemy
@@ -9,6 +8,10 @@ from flask_dance.consumer import OAuth2ConsumerBlueprint
 from keycloak import KeycloakOpenID
 from flask_dance.consumer.storage.sqla import OAuthConsumerMixin, SQLAlchemyStorage
 import os
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 
@@ -35,10 +38,10 @@ with server.app_context():
     db.create_all()
 
 # Keycloak Configuration
-KEYCLOAK_SERVER_URL = 'http://localhost:8051/'
-REALM_NAME = 'CRISH'
-CLIENT_ID = 'crish-web-app'
-CLIENT_SECRET = 'Xx4lBaLqDrCXF4h1XKT1PzQ6A1YOhSS5'  # Replace with the actual client secret
+KEYCLOAK_SERVER_URL = os.getenv('KEYCLOAK_SERVER_URL')
+REALM_NAME = os.getenv('REALM_NAME')
+CLIENT_ID = os.getenv('CLIENT_ID')
+CLIENT_SECRET = os.getenv('CLIENT_SECRET')
 
 keycloak_openid = KeycloakOpenID(server_url=KEYCLOAK_SERVER_URL,
                                  client_id=CLIENT_ID,

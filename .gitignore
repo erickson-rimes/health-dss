@@ -5,4 +5,6 @@ data/sentimental_extraction_kaggle.json
 # Python cache files
 **/__pycache__/
 *.py[cod]
+*.env
+**/flask_session/
 iam/postgres_data
