@@ -37,8 +37,10 @@ def advisories_layout():
             html.Div(id='advisory-details')
         ], style={'width': '70%', 'float': 'left', 'padding': '20px', 'height': '100vh', 'overflowY': 'scroll'}),
         html.Div([
-            html.H2("Advisories", style={'display': 'inline'}),
-            html.Button('+', id='add-advisory-button', n_clicks=0, style={'margin-left': '20px', 'display': 'inline'}),
+        html.Div([
+                html.H2("Advisories", style={'margin': '0'}),
+                html.Button('+', id='add-advisory-button', n_clicks=0)
+            ], style={'display': 'flex', 'justify-content': 'space-between', 'align-items': 'center'}),
             dcc.Loading(id="loading-icon", children=[
                 html.Div(id='timeline-container', children=[])
             ], type="circle"),

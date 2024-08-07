@@ -275,6 +275,8 @@ def temperature(filtered_df, temporal_granularity, title, subtitle):
     unique_titles = list(set(feature['properties']['title'] for feature in features))
     unique_titles.sort()  # Ensure the titles are sorted to maintain order
     title_to_value = {title: i for i, title in enumerate(unique_titles)}
+    title_keys = list(title_to_value.keys())
+    title_values = list(title_to_value.values())
 
     # Add mapped values to each feature
     for feature in features:
@@ -301,9 +303,19 @@ def temperature(filtered_df, temporal_granularity, title, subtitle):
         zoom=zoom,
         center={"lat": center_lat, "lon": center_lon},
         opacity=0.5,
-        labels={'value': 'Temperature (K)'},
-        # height=800
+        labels={'value': 'Temperature (K)', 'color': 'Temperature'},
     )
+
+    # Customize the color bar
+    fig.update_layout(
+        coloraxis_colorbar=dict(
+            title="Temperature Range (K)",
+            tickvals=title_values,  # Values to display on the legend
+            ticktext=title_keys,  # Corresponding labels for the values
+        )
+    )
+
+    fig.update_traces(hoverinfo='none')
 
     return fig
 
@@ -317,10 +329,12 @@ def humidity(filtered_df, temporal_granularity, title, subtitle):
     # Extract features
     features = humidity_contour['features']
 
-    # Extract unique temperature ranges and create a mapping to numerical values
+    # Extract unique humidity ranges and create a mapping to numerical values
     unique_titles = list(set(feature['properties']['title'] for feature in features))
     unique_titles.sort()  # Ensure the titles are sorted to maintain order
     title_to_value = {title: i for i, title in enumerate(unique_titles)}
+    title_keys = list(title_to_value.keys())
+    title_values = list(title_to_value.values())
 
     # Add mapped values to each feature
     for feature in features:
@@ -347,8 +361,18 @@ def humidity(filtered_df, temporal_granularity, title, subtitle):
         zoom=zoom,
         center={"lat": center_lat, "lon": center_lon},
         opacity=0.5,
-        labels={'value': 'Humidity (g/kg)'},
     )
+
+    # Customize the color bar
+    fig.update_layout(
+        coloraxis_colorbar=dict(
+            title="Humidity",
+            tickvals=title_values,  # Values to display on the legend
+            ticktext=title_keys,  # Corresponding labels for the values
+        )
+    )
+
+    fig.update_traces(hoverinfo='none')
 
     return fig
 
