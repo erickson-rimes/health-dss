@@ -13,9 +13,10 @@ from components.about import about
 from components.advisories import advisories_feed
 from components.weather import weather
 import dash
-from dash import html, dcc, Input, Output
+from dash import html, dcc, Input, Output, State
 import dash_bootstrap_components as dbc
 
+# Sidebar component
 sidebar = html.Div(
     [
         html.Div(
@@ -44,47 +45,55 @@ sidebar = html.Div(
                             href="/weather", active="exact", className="sidebar-item"),
                 dbc.NavLink([html.I(className="fas fa-solid fa-chart-simple me-2"), html.Span("Data Analysis")],
                             href="/analysis", active="exact", className="sidebar-item"),
-                # dbc.DropdownMenu(
-                #     id="user-dropdown",
-                #     children=[
-                #         dbc.DropdownMenuItem("Settings", href="/settings"),
-                #         dbc.DropdownMenuItem("Logout", href="/logout"),
-                #     ],
-                #     nav=True,
-                #     className="sidebar-item",
-                #     label=[
-                #         html.I(className="fas fa-user-alt me-2"),
-                #         html.Span("Not logged in")
-                #     ],  # Default label with logo
-                # )
-            ],
-            vertical=True,
-            pills=True,
-        ),
-        dbc.Nav(
-            [
-                dbc.NavItem(
-                    dbc.DropdownMenu(
-                        children=[
-                            dbc.DropdownMenuItem("Settings", href="/settings"),
-                            dbc.DropdownMenuItem("Logout", href="/logout"),
-                        ],
-                        nav=True,
-                        in_navbar=True,
-                        className="sidebar-item",
-                        label=[
-                            html.I(className="fas fa-user-alt me-2"),
-                            html.Span("Not logged in", id="user-dropdown")
-                        ],  # Default label with logo
-                    ),
+                html.Hr(),  # Divider
+                dbc.NavLink(
+                    [
+                        html.I(className="fas fa-language me-2"),
+                        html.Span("Switch to Tetun", id="language-toggle")
+                    ],
+                    href="#",
+                    id="language-toggle-item",
+                    className="sidebar-item"
                 ),
-               
+                html.Hr(),  # Divider
+                dbc.DropdownMenu(
+                    children=[
+                        dbc.DropdownMenuItem("Settings", href="/settings"),
+                        dbc.DropdownMenuItem(divider=True),
+                        dbc.DropdownMenuItem("Logout", href="/logout"),
+                    ],
+                    nav=True,
+                    in_navbar=True,
+                    label=[
+                        html.I(className="fas fa-user-alt me-2"),
+                        html.Span("Not logged in", id="user-dropdown")
+                    ],
+                )
             ],
             vertical=True,
             pills=True,
-            # className="user-menu-nav",
-            style={"position": "absolute", "bottom": "12px"},
         ),
+        # dbc.Nav(
+        #     [
+        #         dbc.DropdownMenu(
+        #             children=[
+        #                 dbc.DropdownMenuItem("Settings", href="/settings"),
+        #                 dbc.DropdownMenuItem(divider=True),
+        #                 dbc.DropdownMenuItem("Logout", href="/logout"),
+        #             ],
+        #             nav=True,
+        #             in_navbar=True,
+        #             label=[
+        #                 html.I(className="fas fa-user-alt me-2"),
+        #                 html.Span("Not logged in", id="user-dropdown")
+        #             ],
+        #         )
+        #     ],
+        #     vertical=True,
+        #     pills=True,
+        #     style={"position": "absolute", "bottom": "12px"},
+        # ),
+        dcc.Store(id='language-store', data={'language': 'English'})  # Store to keep track of the current language
     ],
     className="sidebar",
 )
@@ -94,7 +103,6 @@ my_app.layout = html.Div(
     [
         dcc.Location(id="url"),
         sidebar,
-        # html.H1('Hello, Keycloak Authenticated User!'),
         html.Div(id='user-info', style={"display": "none"}),
         html.Div(
             [
@@ -114,29 +122,26 @@ my_app.layout = html.Div(
 )
 def display_user_info(pathname):
     if is_authenticated():
-        # print(blueprint.session)
         token = blueprint.session.token["access_token"]
         userinfo = keycloak_openid.userinfo(token)
         return f"Logged in as: {userinfo['preferred_username']}"
     return "Not logged in"
 
-# Display user info callback
+# Display user info in the dropdown
 @my_app.callback(
     Output('user-dropdown', 'children'),
     [Input('url', 'pathname')]
 )
-def display_user_info(pathname):
+def update_user_dropdown(pathname):
     if is_authenticated():
-        # print(blueprint.session)
         token = blueprint.session.token["access_token"]
         userinfo = keycloak_openid.userinfo(token)
-        return userinfo['preferred_username']
+        return userinfo['name']
     return "Not logged in"
 
 # Render page content callback
 @my_app.callback(Output("page-content", "children"), [Input("url", "pathname")])
 def render_page_content(pathname):
-    # print(pathname)
     if pathname == "/":
         return advisories_feed.advisories_layout()
     elif pathname == "/alert_map":
@@ -159,8 +164,6 @@ def render_page_content(pathname):
         return virtual_assistant.virtual_assistant_layout()
     elif pathname == "/about":
         return about.about_layout()
-    # elif pathname == "/logout":
-    #     logout()
     return dbc.Container(
         children=[
             html.H1("404 Error: Page Not found", style={"textAlign": "center", "color": "#082446"}),
@@ -172,6 +175,21 @@ def render_page_content(pathname):
             ),
         ]
     )
+
+# Callback to toggle language
+@my_app.callback(
+    [Output('language-toggle', 'children'),
+     Output('language-store', 'data')],
+    [Input('language-toggle-item', 'n_clicks')],
+    [State('language-store', 'data')]
+)
+def toggle_language(n_clicks, language_data):
+    if n_clicks:
+        current_language = language_data['language']
+        new_language = 'Tetun' if current_language == 'English' else 'English'
+        toggle_text = f"Switch to {current_language}"
+        return toggle_text, {'language': new_language}
+    return f"Switch to Tetun", language_data
 
 # Run the app
 if __name__ == "__main__":

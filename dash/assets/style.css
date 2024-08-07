@@ -26,7 +26,7 @@ Reference: https://community.plotly.com/t/sidebar-with-icons-expands-on-hover-an
   }
   
   /* make sure the contents of the navlink don't wrap when navbar collapses */
-  .sidebar .nav-link {
+  .sidebar > * {
     width: 100%;
     overflow: hidden;
     white-space: nowrap;
