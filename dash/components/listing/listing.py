@@ -19,9 +19,8 @@ hovertemplate = """
 <br>
 <b>Type:</b> %{customdata[0]}<br>
 <b>Ownership:</b> %{customdata[1]}<br>
-<b>Accreditation:</b> %{customdata[2]}<br>
-<b>Services Offered:</b> %{customdata[3]}<br>
-<b>Operating Hours:</b> %{customdata[4]}<br>
+<b>Operating Hours:</b> %{customdata[3]}<br>
+<b>Services Offered:</b> <br>%{customdata[2]}<br>
 <extra></extra>
 """
 
@@ -83,94 +82,199 @@ def listing_layout():
 
     return layout
 
+def get_unique_values(column_name):
+    conn = sqlite3.connect("health_facilities.db")
+    query = f"SELECT DISTINCT [{column_name}] FROM Facility"
+    df = pd.read_sql_query(query, conn)
+    conn.close()
+    return df[column_name].dropna().tolist()
 
+
+def get_min_max_values(column_name):
+    # Connect to the SQLite database
+    conn = sqlite3.connect('health_facilities.db')
+    cursor = conn.cursor()
+
+    # Query to get the min and max values for the specified column
+    query = f"SELECT MIN(`{column_name}`), MAX(`{column_name}`) FROM Facility"
+    cursor.execute(query)
+    
+    # Fetch the result
+    result = cursor.fetchone()
+    conn.close()
+
+    # Return the min and max values as a dictionary
+    return {'min': int(result[0]), 'max': int(result[1])}
 
 def left_side():
+    # Fetch unique values from the database for dropdowns and checklists
+    facility_types = get_unique_values("Facility Type")
+    properties = get_unique_values("Property")
+    municipalities = get_unique_values("Municipality")
+    administrative_posts = get_unique_values("Postu Administrative")
+    sucos = get_unique_values("Suco")
+    aldeias = get_unique_values("Aldeia")
+    ambulance_range = get_min_max_values("Ambulance")
+    maternity_bed_range = get_min_max_values("Maternity bed")
+    total_bed_range = get_min_max_values("Total bed")
+    operating_days = get_unique_values("Operating Days")
+    operating_hours = get_unique_values("Operating Hours")
+
+    # Sorting the options
+    facility_types.sort()
+    properties.sort()
+    municipalities.sort()
+    administrative_posts.sort()
+    sucos.sort()
+    aldeias.sort()
+    operating_days.sort()
+    operating_hours.sort()
+
     return html.Div(
         [
             html.Div([html.H3("🏥 Facility Filters")]),
             html.Div(
                 [
+                    html.Label("Facility Name", style={"fontWeight": "bold"}),
+                    dcc.Input(
+                        id="facility_name_filter",
+                        type="text",
+                        placeholder="Enter Facility Name",
+                    ),
+                    html.Br(),
                     html.Label("Facility Type", style={"fontWeight": "bold"}),
                     dcc.Dropdown(
                         id="facility_type_filter",
-                        options=[
-                            {"label": "Hospital", "value": "hospital"},
-                            {"label": "Clinic", "value": "clinic"},
-                            {"label": "Specialized Hospital", "value": "specialized_hospital"},
-                            {"label": "Primary Care Clinic", "value": "primary_care_clinic"},
-                            {"label": "Diagnostic Lab", "value": "diagnostic_lab"},
-                            {"label": "Other", "value": "other"},
-                        ],
-                        value=["hospital"],  # Use an empty list as the default value for multiple selections
+                        options=[{"label": ft, "value": ft} for ft in facility_types],
+                        value=[],
                         placeholder="Select Facility Type(s)",
                         multi=True,
                     ),
                     html.Br(),
-                    html.Label("Ownership", style={"fontWeight": "bold"}),
+                    html.Label("Property", style={"fontWeight": "bold"}),
                     dcc.Dropdown(
-                        id="ownership_filter",
-                        options=[
-                            {"label": "Government", "value": "government"},
-                            {"label": "Private", "value": "private"},
-                            {"label": "Non-profit", "value": "non_profit"},
-                            {"label": "Public-private Partnership", "value": "public_private_partnership"},
-                        ],
+                        id="property_filter",
+                        options=[{"label": prop, "value": prop} for prop in properties],
                         value=[],
-                        placeholder="Select Ownership Type(s)",
+                        placeholder="Select Property Type(s)",
                         multi=True,
                     ),
                     html.Br(),
-                    html.Label("Accreditation Status", style={"fontWeight": "bold"}),
-                    dcc.RadioItems(
-                        id="accreditation_status_filter",
-                        options=[
-                            {"label": "Accredited", "value": True},
-                            {"label": "Not Accredited", "value": False},
-                        ],
-                        value="",
-                    ),
-                    html.Br(),
                     html.Label("Service Offerings", style={"fontWeight": "bold"}),
-                    dcc.Checklist(
+                    dcc.Input(
                         id="service_offerings_filter",
-                        options=[
-                            {"label": "Emergency Services", "value": "emergency_services"},
-                            {"label": "Outpatient Services", "value": "outpatient_services"},
-                            {"label": "Surgical Services", "value": "surgical_services"},
-                            {"label": "Diagnostic Services", "value": "diagnostic_services"},
-                            {"label": "Other", "value": "other"},
-                        ],
-                        value=[],
+                        type="text",
+                        placeholder="Enter Service Offering(s)",
                     ),
                     html.Br(),
                     html.Label("Municipality", style={"fontWeight": "bold"}),
-                    dcc.Input(
+                    dcc.Dropdown(
                         id="municipality_filter",
-                        type="text",
-                        placeholder="Enter Municipality",
+                        options=[{"label": muni, "value": muni} for muni in municipalities],
+                        value=[],
+                        placeholder="Select Municipality",
+                        multi=True,
                     ),
                     html.Br(),
                     html.Label("Administrative Post", style={"fontWeight": "bold"}),
-                    dcc.Input(
+                    dcc.Dropdown(
                         id="administrative_post_filter",
-                        type="text",
-                        placeholder="Enter Administrative Post",
+                        options=[{"label": post, "value": post} for post in administrative_posts],
+                        value=[],
+                        placeholder="Select Administrative Post",
+                        multi=True,
                     ),
                     html.Br(),
                     html.Label("Suco", style={"fontWeight": "bold"}),
-                    dcc.Input(
+                    dcc.Dropdown(
                         id="suco_filter",
-                        type="text",
-                        placeholder="Enter Suco",
+                        options=[{"label": suco, "value": suco} for suco in sucos],
+                        value=[],
+                        placeholder="Select Suco",
+                        multi=True,
+                    ),
+                    html.Br(),
+                    html.Label("Aldeia", style={"fontWeight": "bold"}),
+                    dcc.Dropdown(
+                        id="aldeia_filter",
+                        options=[{"label": aldeia, "value": aldeia} for aldeia in aldeias],
+                        value=[],
+                        placeholder="Select Aldeia",
+                        multi=True,
+                    ),
+                    html.Br(),
+                    html.Label("Ambulance Availability", style={"fontWeight": "bold"}),
+                    dcc.RangeSlider(
+                        id="ambulance_filter",
+                        min=ambulance_range['min'],
+                        max=ambulance_range['max'],
+                        # step=5,
+                        value=[ambulance_range['min'], ambulance_range['max']],
+                        # marks={i: str(i) for i in range(ambulance_range['min'], ambulance_range['max'] + 1, 1)},
+                        tooltip={"placement": "bottom", "always_visible": True},
+                        allowCross=False
+                    ),
+                    html.Br(),
+                    html.Label("Maternity Bed Count", style={"fontWeight": "bold"}),
+                    dcc.RangeSlider(
+                        id="maternity_bed_filter",
+                        min=maternity_bed_range['min'],
+                        max=maternity_bed_range['max'],
+                        # step=max(int(maternity_bed_range['max']/10), 1),
+                        value=[maternity_bed_range['min'], maternity_bed_range['max']],
+                        # marks={i: str(i) for i in range(maternity_bed_range['min'], maternity_bed_range['max'] + 1, 1)},
+                        tooltip={"placement": "bottom", "always_visible": True},
+                        allowCross=False
+                    ),
+                    html.Br(),
+                    html.Label("Total Bed Count", style={"fontWeight": "bold"}),
+                    dcc.RangeSlider(
+                        id="total_bed_filter",
+                        min=total_bed_range['min'],
+                        max=total_bed_range['max'],
+                        # step=max(int(total_bed_range['max']/10), 1),
+                        value=[total_bed_range['min'], total_bed_range['max']],
+                        # marks={i: str(i) for i in range(total_bed_range['min'], total_bed_range['max'] + 1, 1)},
+                        tooltip={"placement": "bottom", "always_visible": True},
+                        allowCross=False
+                    ),
+                    html.Br(),
+                    html.Label("Operating Days", style={"fontWeight": "bold"}),
+                    dcc.Dropdown(
+                        id="operating_days_filter",
+                        options=[{"label": day, "value": day} for day in operating_days],
+                        value=[],
+                        placeholder="Select Operating Days",
+                        multi=True,
+                    ),
+                    html.Br(),
+                    html.Label("Operating Hours", style={"fontWeight": "bold"}),
+                    dcc.Dropdown(
+                        id="operating_hours_filter",
+                        options=[{"label": hour, "value": hour} for hour in operating_hours],
+                        value=[],
+                        placeholder="Select Operating Hours",
+                        multi=True,
+                    ),
+                    html.Br(),
+                    html.Label("Color By", style={"fontWeight": "bold"}),
+                    dcc.Dropdown(
+                        id="color_by_configuration",
+                        options=[
+                            {"label": "Facility Type", "value": "Facility Type"},
+                            {"label": "Property", "value": "Property"},
+                            {"label": "Municipality", "value": "Municipality"},
+                            {"label": "Administrative Post", "value": "Postu Administrative"},
+                            {"label": "Ambulance Availability", "value": "Ambulance"}
+                        ],
+                        value="Facility Type",
+                        placeholder="Select Dimension",
                     ),
                 ],
                 style={"display": "flex", "flexDirection": "column", "padding": "10px"},
             ),
         ]
     )
-
-
 
 def right_side():
     return html.Div(
@@ -184,46 +288,104 @@ def right_side():
     )
 
 def query_facilities(filters):
-    con = sqlite3.connect("facilities.db")
+    con = sqlite3.connect("health_facilities.db")
 
     # Base query
     base_query = """
-    SELECT Facility.*, Address.* FROM Facility
-    INNER JOIN Address ON Facility.addressId = Address.id
+    SELECT * FROM Facility
     """
 
     # Initialize conditions list and parameters list
     conditions = []
     parameters = []
 
-    # Check each filter and add condition and parameter if the filter is not empty
+    # Facility Name filter
+    if filters.get("facilityName"):
+        conditions.append("Facility.`Facility Name` LIKE ?")
+        parameters.append(f"%{filters['facilityName']}%")
+
     # Handling multiple facilityType values
     if filters.get("facilityType"):
         placeholders = ','.join('?' * len(filters["facilityType"]))  # Create placeholders for query
-        conditions.append(f"Facility.facilityType IN ({placeholders})")
+        conditions.append(f"Facility.`Facility Type` IN ({placeholders})")
         parameters.extend(filters["facilityType"])
-    if filters.get("ownership"):
-        placeholders = ','.join('?' * len(filters["ownership"]))  # Create placeholders for query
-        conditions.append(f"Facility.ownership IN ({placeholders})")
-        parameters.extend(filters["ownership"])
-    if "accreditationStatus" in filters and filters["accreditationStatus"] is not None:  # Assuming True or False
-        conditions.append("Facility.accreditationStatus = ?")
-        parameters.append(filters["accreditationStatus"])
-    if filters.get("municipality"):
-        conditions.append("Address.municipality = ?")
-        parameters.append(filters["municipality"])
-    if filters.get("administrativePost"):
-        conditions.append("Address.administrativePost = ?")
-        parameters.append(filters["administrativePost"])
-    if filters.get("suco"):
-        conditions.append("Address.suco = ?")
-        parameters.append(filters["suco"])
     
-    # Handling service offerings as a special case
+    # Property filter
+    if filters.get("property"):
+        placeholders = ','.join('?' * len(filters["property"]))  # Create placeholders for query
+        conditions.append(f"Facility.Property IN ({placeholders})")
+        parameters.extend(filters["property"])
+    
+    # Municipality filter
+    if filters.get("municipality"):
+        placeholders = ','.join('?' * len(filters["municipality"]))  # Create placeholders for query
+        conditions.append(f"Facility.Municipality IN ({placeholders})")
+        parameters.extend(filters["municipality"])
+    
+    # Administrative Post filter
+    if filters.get("administrativePost"):
+        placeholders = ','.join('?' * len(filters["administrativePost"]))  # Create placeholders for query
+        conditions.append(f"Facility.`Postu Administrative` IN ({placeholders})")
+        parameters.extend(filters["administrativePost"])
+    
+    # Suco filter
+    if filters.get("suco"):
+        placeholders = ','.join('?' * len(filters["suco"]))  # Create placeholders for query
+        conditions.append(f"Facility.Suco IN ({placeholders})")
+        parameters.extend(filters["suco"])
+    
+    # Aldeia filter
+    if filters.get("aldeia"):
+        placeholders = ','.join('?' * len(filters["aldeia"]))  # Create placeholders for query
+        conditions.append(f"Facility.Aldeia IN ({placeholders})")
+        parameters.extend(filters["aldeia"])
+
+    # Service Offerings filter
     if filters.get("serviceOfferings"):
-        for service in filters["serviceOfferings"]:
-            conditions.append("Facility.serviceOfferings LIKE ?")
-            parameters.append(f"%{service}%")
+        conditions.append("Facility.`Services Offer` LIKE ?")
+        parameters.append(f"%{filters['serviceOfferings']}%")
+
+    # Ambulance range filter
+    if filters.get("ambulanceRange"):
+        min_val, max_val = filters["ambulanceRange"]
+        if min_val is not None:
+            conditions.append("Facility.Ambulance >= ?")
+            parameters.append(min_val)
+        if max_val is not None:
+            conditions.append("Facility.Ambulance <= ?")
+            parameters.append(max_val)
+
+    # Maternity Bed range filter
+    if filters.get("maternityBedRange"):
+        min_val, max_val = filters["maternityBedRange"]
+        if min_val is not None:
+            conditions.append("Facility.`Maternity bed` >= ?")
+            parameters.append(min_val)
+        if max_val is not None:
+            conditions.append("Facility.`Maternity bed` <= ?")
+            parameters.append(max_val)
+
+    # Total Bed range filter
+    if filters.get("totalBedRange"):
+        min_val, max_val = filters["totalBedRange"]
+        if min_val is not None:
+            conditions.append("Facility.`Total bed` >= ?")
+            parameters.append(min_val)
+        if max_val is not None:
+            conditions.append("Facility.`Total bed` <= ?")
+            parameters.append(max_val)
+
+    # Operating Days filter
+    if filters.get("operatingDays"):
+        placeholders = ','.join('?' * len(filters["operatingDays"]))  # Create placeholders for query
+        conditions.append(f"Facility.`Operating Days` IN ({placeholders})")
+        parameters.extend(filters["operatingDays"])
+
+    # Operating Hours filter
+    if filters.get("operatingHours"):
+        placeholders = ','.join('?' * len(filters["operatingHours"]))  # Create placeholders for query
+        conditions.append(f"Facility.`Operating Hours` IN ({placeholders})")
+        parameters.extend(filters["operatingHours"])
 
     # Construct the final query
     if conditions:
@@ -231,8 +393,6 @@ def query_facilities(filters):
     else:
         query = base_query  # No filters applied
 
-    print("Query:", query)
-    print("Parameters:", parameters)
     # Executing the query
     df = pd.read_sql_query(query, con, params=parameters)
 
@@ -295,48 +455,63 @@ def get_plotting_zoom_level_and_center_coordinates_from_lonlat(longitudes=None, 
         Output("listing_map_display", "figure"),
     ],
     [
+        Input("facility_name_filter", "value"),
         Input("facility_type_filter", "value"),
-        Input("ownership_filter", "value"),
-        Input("accreditation_status_filter", "value"),
+        Input("property_filter", "value"),
         Input("service_offerings_filter", "value"),
         Input("municipality_filter", "value"),
         Input("administrative_post_filter", "value"),
         Input("suco_filter", "value"),
-        # Assuming you have inputs for each of these filters in your Dash app
+        Input("aldeia_filter", "value"),
+        Input("ambulance_filter", "value"),
+        Input("maternity_bed_filter", "value"),
+        Input("total_bed_filter", "value"),
+        Input("operating_days_filter", "value"),
+        Input("operating_hours_filter", "value"),
+        Input("color_by_configuration", "value")
     ],
 )
-def update_facility_content(facilityType, ownership, accreditationStatus, serviceOfferings, municipality, administrativePost, suco):
+def update_facility_content(
+    facilityName, facilityType, property, serviceOfferings, municipality, administrativePost, suco, aldeia,
+    ambulanceRange, maternityBedRange, totalBedRange, operatingDays, operatingHours, colorConfiguration
+):
     filters = {
+        "facilityName": facilityName if facilityName else None,
         "facilityType": facilityType if facilityType else None,
-        "ownership": ownership if ownership else None,
-        "accreditationStatus": accreditationStatus if accreditationStatus else None,
+        "property": property if property else None,
         "serviceOfferings": serviceOfferings if serviceOfferings else [],
         "municipality": municipality if municipality else None,
         "administrativePost": administrativePost if administrativePost else None,
         "suco": suco if suco else None,
+        "aldeia": aldeia if aldeia else None,
+        "ambulanceRange": ambulanceRange if ambulanceRange else [None, None],
+        "maternityBedRange": maternityBedRange if maternityBedRange else [None, None],
+        "totalBedRange": totalBedRange if totalBedRange else [None, None],
+        "operatingDays": operatingDays if operatingDays else None,
+        "operatingHours": operatingHours if operatingHours else None
     }
-    print("Filters:", filters)
-    filtered_df = query_facilities(filters)
-    print(filtered_df.columns)
-
-    filtered_df['formattedServices'] = filtered_df['serviceOfferings'].apply(
-    lambda x: x.replace('[', '').replace(']', '').replace('\"', '').replace(',', ', ').replace("_", " ").title() if x else "Not available")
     
-    # format the ownership column
-    filtered_df['formattedOwnership'] = filtered_df['ownership'].apply(lambda x: x.replace('_', ' ').title() if x else "Unknown")
+    filtered_df = query_facilities(filters)
+    
+    # Format the 'Services Offer' column
+    filtered_df['formattedServices'] = filtered_df['Services Offer'].apply(
+        lambda x: x.replace('[', '').replace(']', '').replace('\"', '').replace(',', ', ').replace("_", " ").title() if x else "Not available"
+    )
+    
+    # Format the 'Property' column
+    filtered_df['formattedProperty'] = filtered_df['Property'].apply(lambda x: x.title() if x else "Unknown")
 
-    # format the facility type column
-    filtered_df['formattedFacilityType'] = filtered_df['facilityType'].apply(lambda x: x.replace('_', ' ').title() if x else "Unknown")
+    # Format the 'Facility Type' column
+    filtered_df['formattedFacilityType'] = filtered_df['Facility Type'].apply(lambda x: x.title() if x else "Unknown")
 
-    # tranform accreditationStatus value of 0 or 1 to Yes or No
-    filtered_df['formattedAccreditationStatus'] = filtered_df['accreditationStatus'].apply(lambda x: "Yes" if x else "No")
+    
 
-    cards_content = html.Div(
-        create_facility_cards(filtered_df), style={"display": "flex", "flexWrap": "wrap"}
+    filtered_df['formattedServices_html'] = filtered_df['Services Offer'].apply(
+        lambda x: x.replace('\n', '<br>') if x else "Not available"
     )
 
     if filtered_df.empty:
-    # Create a figure with a textual message instead of a map
+        # Create a figure with a textual message instead of a map
         fig = go.Figure()
         # Add text in the middle of the figure
         fig.add_trace(go.Scatter(x=[0.5], y=[0.5], text=["No result found for the filter."], mode="text", 
@@ -347,36 +522,31 @@ def update_facility_content(facilityType, ownership, accreditationStatus, servic
                         plot_bgcolor="white", 
                         margin=dict(t=0, b=0, l=0, r=0))
     else:
-        zoom, (center_lat, center_lon) = get_plotting_zoom_level_and_center_coordinates_from_lonlat(filtered_df['longitude'], filtered_df['latitude'])
-        print("zoom:", zoom)
+        zoom, (center_lat, center_lon) = get_plotting_zoom_level_and_center_coordinates_from_lonlat(filtered_df['Longitude'], filtered_df['Latitude'])
 
         fig = px.scatter_mapbox(
             filtered_df,
-            lat="latitude",
-            lon="longitude",
-            hover_name="facilityName",  # Display the facility name when hovering over a point
-            # hover_data=["facilityType", "ownership"],  # Additional data to show on hover
+            lat="Latitude",
+            lon="Longitude",
+            hover_name="Facility Name",  # Display the facility name when hovering over a point
             custom_data=[
                 "formattedFacilityType", 
-                "formattedOwnership", 
-                "formattedAccreditationStatus", 
-                "formattedServices", 
-                "operatingHours"
+                "formattedProperty", 
+                "formattedServices_html", 
+                "Operating Hours"
             ],
-            color="ownership",  # Use the 'ownership' column to determine point colors
-            color_discrete_map={  # Optional: Define specific colors for each ownership type
-                "government": "darkgreen",
-                "private": "darkblue",
-                "non_profit": "red",
-                "public_private_partnership": "grey"
-            },
+            color=colorConfiguration,  # Use the 'Property' column to determine point colors
+            # color_discrete_map={  # Optional: Define specific colors for each property type
+            #     "Government": "darkgreen",
+            #     "Private": "darkblue",
+            # },
             zoom=zoom,
             center={"lat": center_lat, "lon": center_lon},
             mapbox_style="open-street-map",
         )
         fig.update_traces(marker=dict(size=8))  # Set a constant marker size
         fig.update_traces(hovertemplate=hovertemplate)
-        fig.update_layout(margin=dict(t=0, b=0, l=0, r=0), showlegend=False, mapbox=dict(
+        fig.update_layout(margin=dict(t=0, b=0, l=0, r=0), mapbox=dict(
             bearing=0,
             center=dict(
                 lat=center_lat,
@@ -385,39 +555,43 @@ def update_facility_content(facilityType, ownership, accreditationStatus, servic
             pitch=0,
         ))
 
+    # Extract the color mappings
+    color_mapping = {point['name']: point['marker']['color'] for point in fig.data}
+
+    print(color_mapping)
+
+    cards_content = html.Div(
+        create_facility_cards(filtered_df, color_mapping, colorConfiguration), style={"display": "flex", "flexWrap": "wrap"}
+    )
+
     return cards_content, fig
 
-def create_facility_cards(df):
+def create_facility_cards(df, color_mapping, color_configuration):
     cards = []
     for _, row in df.iterrows():
-        # Define background color based on ownership
-        header_color = {
-            "government": "lightgreen",
-            "private": "lightblue",
-            "non_profit": "salmon",
-            "public_private_partnership": "lightgrey",
-        }.get(row.get("ownership", ""), "lightgrey")
+        # Define background color based on property (ownership)
+        header_color = color_mapping.get(row.get(color_configuration, ""), "lightgrey")
 
         header_style = {"backgroundColor": header_color}
 
-        if row.get('serviceOfferings'):
-            # Deserialize the JSON string into a Python list
-            retrieved_list = json.loads(row.get('serviceOfferings'))
-        else:
-            # If 'serviceOfferings' is empty or not present, use an empty list
-            retrieved_list = []
+        # if row.get('Services Offer'):
+        #     # Deserialize the JSON string into a Python list
+        #     retrieved_list = json.loads(row.get('Services Offer'))
+        # else:
+        #     # If 'Services Offer' is empty or not present, use an empty list
+        #     retrieved_list = []
 
         # Convert the list into a comma-separated string, or use "Not available" if the list is empty
-        services_offered = ', '.join([item.replace('_', ' ').title() for item in retrieved_list]) if retrieved_list else "Not available"
-        facility_type = row.get('facilityType', 'Unknown').replace('_', ' ').title()
+        # services_offered = ', '.join([item.replace('_', ' ').title() for item in retrieved_list]) if retrieved_list else "Not available"
+        services_offered = row.get("Services Offer")
+        facility_type = row.get('Facility Type', 'Unknown').replace('_', ' ').title()
 
         card_content = [
             dbc.CardHeader(
                 [
-                    html.H6(row.get('facilityName', "Unknown Facility"), className="card-header", style={
+                    html.H6(row.get('Facility Name', "Unknown Facility"), className="card-header", style={
                         **header_style,  # Presuming header_style is a dictionary with other styles
                         "display": "-webkit-box",
-                        # "line-height": "1.2",  # Adjust based on your font size to fit two lines
                         "min-height": "3em",  # Line height * number of lines you want (1.2em * 2 lines here)
                         "overflow": "hidden",
                         "text-overflow": "ellipsis",
@@ -425,17 +599,14 @@ def create_facility_cards(df):
                         "-webkit-box-orient": "vertical",
                         "white-space": "normal",  # Ensure text wraps
                     }),
-                    # Put a margin of 16px on top of the type text
+                    # Put a margin on the left of the facility type text
                     html.Span(f"{facility_type}", style={"marginLeft": "12px", 'fontSize': '12px', 'lineHeight': '1.2'}),
                 ]
             ),
             dbc.CardBody(
                 [
-                    html.P([html.Strong("Ownership: "), row.get('formattedOwnership', 'Unknown')]),
-                    html.P([html.Strong("Accreditation: "), row.get('formattedAccreditation', 'No')]),
-                    html.P([html.Strong("Operating Hours: "), row.get('operatingHours', 'Unknown')]),
-                    html.P([html.Strong("Emergency Services: "), "Yes" if row.get('emergencyServices', False) else "No"]),
-                    html.P([html.Strong("Technology Integration: "), "Yes" if row.get('technologyIntegration', False) else "No"]),
+                    html.P([html.Strong("Property: "), row.get('formattedProperty', 'Unknown')]),
+                    html.P([html.Strong("Operating Hours: "), row.get('Operating Hours', 'Unknown')]),
                     html.P([html.Strong("Services Offered: "), services_offered]),
                 ],
                 style={'fontSize': '12px', 'lineHeight': '1.2'}
