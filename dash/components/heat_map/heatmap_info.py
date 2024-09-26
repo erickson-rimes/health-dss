@@ -69,6 +69,13 @@ def get_plotting_zoom_level_and_center_coordinates_from_lonlat(longitudes=None, 
     # Finally, return the zoom level and the associated boundary-box center coordinates
     return zoom, b_box['center']
 
+def get_unique_values(column_name):
+    conn = sqlite3.connect('sqlite_dbs/case_reports.db')
+    query = f"SELECT DISTINCT [{column_name}] FROM case_reports"
+    df = pd.read_sql_query(query, conn)
+    conn.close()
+    return df[column_name].dropna().tolist()
+
 def heatmap_plot_layout():
     layout = html.Div(
         [
@@ -111,7 +118,7 @@ def update_case_reports_store(start_date, end_date, heatmap_plot_case_type_filte
     return filtered_df.to_json(date_format="iso", orient="split")
 
 def query_case_reports(filters):
-    con = sqlite3.connect('case_reports.db')
+    con = sqlite3.connect('sqlite_dbs/case_reports.db')
 
     base_query = "SELECT * FROM case_reports"
 
@@ -248,6 +255,8 @@ def heatmap(filtered_df, temporal_granularity, title, subtitle):
     create_date_columns(filtered_df, temporal_granularity)
     zoom, (center_lat, center_lon) = get_plotting_zoom_level_and_center_coordinates_from_lonlat(filtered_df['longitude'], filtered_df['latitude'])
 
+    print(filtered_df.head())
+
     # group by case type and sum up the number of cases
     df_grouped = filtered_df.groupby(["date", "latitude", "longitude"]).agg({"numberOfCases": "sum"}).reset_index()
 
@@ -352,6 +361,9 @@ def cases_by_administrative_level(filtered_df, temporal_granularity, title, subt
 #     return fig
 
 def heatmap_plot_content():
+
+    case_types = get_unique_values('caseType')
+
     return html.Div(
         [
             html.Div([html.H3("Heatmap Plot")]),
@@ -405,13 +417,9 @@ def heatmap_plot_content():
             html.Label("Case Type", style={"fontWeight": "bold"}),
             dcc.Dropdown(
                 id=id_prefix+"heatmap_plot_case_type_filter",
-                options=[
-                    {"label": "Heat Stroke", "value": "Heat Stroke"},
-                    {"label": "Dengue Case", "value": "Dengue Case"},
-                    {"label": "Diarrhea Case", "value": "Diarrhea Case"},
-                ],
+                options=[{"label": ft, "value": ft} for ft in case_types],
                 multi=True,
-                value=["Diarrhea Case"],
+                value=[],
             ),
             html.Br(),
             # choose reporting entity

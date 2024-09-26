@@ -41,6 +41,13 @@ available_plot_types = {
     "scatter_polar": px.scatter_polar,
 }
 
+def get_unique_values(column_name):
+    conn = sqlite3.connect('sqlite_dbs/case_reports.db')
+    query = f"SELECT DISTINCT [{column_name}] FROM case_reports"
+    df = pd.read_sql_query(query, conn)
+    conn.close()
+    return df[column_name].dropna().tolist()
+
 def bar_plot_layout():
     layout = html.Div(
         [
@@ -94,7 +101,7 @@ def update_case_reports_store(start_date, end_date, bar_plot_case_type_filter, b
     return filtered_df.to_json(date_format="iso", orient="split")
 
 def query_case_reports(filters):
-    con = sqlite3.connect('case_reports.db')
+    con = sqlite3.connect('sqlite_dbs/case_reports.db')
 
     base_query = "SELECT * FROM case_reports"
 
@@ -339,6 +346,9 @@ def lag_time_analysis(filtered_df, title, subtitle):
     return fig
 
 def bar_plot_content():
+
+    case_types = get_unique_values('caseType')
+
     return html.Div(
         [
             html.Div([html.H3("Bar Plot")]),
@@ -394,13 +404,9 @@ def bar_plot_content():
             html.Label("Case Type", style={"fontWeight": "bold"}),
             dcc.Dropdown(
                 id="bar_plot_case_type_filter",
-                options=[
-                    {"label": "Heat Stroke", "value": "Heat Stroke"},
-                    {"label": "Dengue Case", "value": "Dengue Case"},
-                    {"label": "Diarrhea Case", "value": "Diarrhea Case"},
-                ],
+                options=[{"label": ft, "value": ft} for ft in case_types],
                 multi=True,
-                value=["Diarrhea Case"],
+                value=[],
             ),
             html.Br(),
             # choose reporting entity

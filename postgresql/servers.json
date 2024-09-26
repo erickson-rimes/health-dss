@@ -1,0 +1,14 @@
+{
+    "Servers": {
+        "1": {
+            "Name": "CRISH",
+            "Group": "Servers",
+            "Port": 8053,
+            "Username": "myuser",
+            "Host": "10.227.203.244",
+            "SSLMode": "prefer",
+            "MaintenanceDB": "mydb",
+            "PasswordExecCommand": "echo 'mypassword'"
+        }
+    }
+}

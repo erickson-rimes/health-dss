@@ -1,0 +1,67 @@
+services:
+  postgres:
+    image: postgres:14
+    container_name: postgres_container
+    restart: always
+    environment:
+      POSTGRES_USER: myuser
+      POSTGRES_PASSWORD: mypassword
+      POSTGRES_DB: mydb
+    volumes:
+      - ./postgres_data:/var/lib/postgresql/data
+    ports:
+      - "8053:5432"
+    networks:
+      - crish-network
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: pgadmin_container
+    restart: always
+    volumes:
+      - ./config_local.py:/pgadmin4/config_local.py
+      - ./servers.json:/pgadmin4/servers.json
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@mydomain.com
+      PGADMIN_DEFAULT_PASSWORD: adminpassword
+      PGADMIN_CONFIG_APP_NAME: "'CRISH pgAdmin'"
+      PGADMIN_CONFIG_AUTHENTICATION_SOURCES: "['internal', 'oauth2']"
+      PGADMIN_CONFIG_OAUTH2_AUTO_CREATE_USER: "True"
+    ports:
+      - "8054:80"
+    networks:
+      - crish-network
+
+  superset:
+    build: 
+      context: .
+      dockerfile: superset.Dockerfile  # Refers to the custom Dockerfile
+    container_name: superset_container
+    restart: always
+    environment:
+      # SUPERSET_ENV: production
+      # SUPERSET_USER: admin
+      # SUPERSET_PASSWORD: supersetpassword
+      # SUPERSET_DB_HOST: postgres
+      # SUPERSET_DB_PORT: 5432
+      # SUPERSET_DB_NAME: mydb
+      # SUPERSET_DB_USER: myuser
+      # SUPERSET_DB_PASSWORD: mypassword
+      SQLALCHEMY_DATABASE_URI: "postgresql+psycopg2://myuser:mypassword@http://10.227.203.244:8054/myddb"
+      # OAUTH_CLIENT_ID: superset-client
+      # OAUTH_CLIENT_SECRET: PlIYkDQ1ZEpYzczJfdPIfF2dIhumjOsX
+    volumes:
+      - ./superset_data:/var/lib/superset
+      - ./superset_config.py:/app/pythonpath/superset_config.py
+      - ./custom_sso_security_manager.py:/app/pythonpath/custom_sso_security_manager.py
+      - ./client_secret.json:/app/pythonpath/client_secret.json
+    ports:
+      - "8055:8088"
+    depends_on:
+      - postgres
+    networks:
+      - crish-network
+
+networks:
+  crish-network:
+    external: true

@@ -7,4 +7,9 @@ data/sentimental_extraction_kaggle.json
 *.py[cod]
 *.env
 **/flask_session/
-iam/postgres_data
+**iam/postgres_data
+**/minio/data/
+**/postgres_data/
+**/superset_data/
+**.DS_Store
+**/flask_session/

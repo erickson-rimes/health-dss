@@ -30,60 +30,47 @@ hovertemplate = """
 def listing_layout():
     layout = html.Div(
         [
-            # Map Display Area as the base layer
+            # Map Display Area (50% width)
             html.Div(
                 dcc.Graph(id="listing_map_display", style={"height": "100%"}),  # Set map height to fill the viewport
-                style={"position": "relative", "width": "80%", "height": "65%"},  # Set the parent div to fill the viewport
+                style={"width": "60%", "height": "100%"},  # 50% width, full height
             ),
-            # Floating left_side()
+            # Facilities Cards Area (25% width)
             html.Div(
                 style={
-                    "position": "absolute",
-                    "top": "0",  # Align to the top of the viewport
-                    "right": "0",  # Align to the left of the viewport
+                    "width": "20%",  # 25% width
                     "height": "100%",  # Full height
-                    "width": "20%",  # Adjust the width as necessary
-                    "padding": "10px",
-                    "background": "rgba(255, 255, 255, 0.8)",  # Semi-transparent background
-                    "overflow": "auto",  # Add scroll for overflow content
-                    "zIndex": "10",  # Ensure it's above the map
-                },
-                children=[
-                    left_side(),
-                ],
-            ),
-            # Floating right_side() at the bottom
-            html.Div(
-                id='tab',
-                children='Facilities',
-                style={'cursor': 'pointer', 'padding': '10px', 'border': '1px solid #ddd', 'max-width': '200px', 'position': 'absolute', 'bottom': '35%', "background": "rgba(255, 255, 255, 1)",}
-            ),
-            html.Div(
-                style={
-                    "position": "absolute",
-                    "bottom": "0",  # Align to the bottom of the viewport
-                    "left": "0",  # Align to the left of the viewport
-                    "width": "80%",  # Full width
-                    "height": "35%",
-                    # "min-height": "24rem",  # Set minimum height to 40rem
                     "overflow": "auto",  # Add scroll for overflow content
                     "padding": "10px",
                     "background": "rgba(255, 255, 255, 1)", 
                     "zIndex": "10",  # Ensure it's above the map
                 },
                 children=[
-                    
-                    right_side(),
+                    facilities_cards(),
+                ],
+            ),
+            # Floating filter_component (25% width)
+            html.Div(
+                style={
+                    "width": "20%",  # 25% width
+                    "height": "100%",  # Full height
+                    "padding": "10px",
+                    "background": "rgba(255, 255, 255, 0.8)",  # Semi-transparent background
+                    "overflow": "auto",  # Add scroll for overflow content
+                    "zIndex": "10",  # Ensure it's above the map
+                },
+                children=[
+                    filter_component(),
                 ],
             ),
         ],
-        style={"position": "relative", "width": "100%", "height": "100vh"}  # Container filling the viewport
+        style={"display": "flex", "width": "100%", "height": "100vh"}  # Container filling the viewport using flexbox
     )
 
     return layout
 
 def get_unique_values(column_name):
-    conn = sqlite3.connect("health_facilities.db")
+    conn = sqlite3.connect("sqlite_dbs/health_facilities.db")
     query = f"SELECT DISTINCT [{column_name}] FROM Facility"
     df = pd.read_sql_query(query, conn)
     conn.close()
@@ -92,7 +79,7 @@ def get_unique_values(column_name):
 
 def get_min_max_values(column_name):
     # Connect to the SQLite database
-    conn = sqlite3.connect('health_facilities.db')
+    conn = sqlite3.connect('sqlite_dbs/health_facilities.db')
     cursor = conn.cursor()
 
     # Query to get the min and max values for the specified column
@@ -106,7 +93,7 @@ def get_min_max_values(column_name):
     # Return the min and max values as a dictionary
     return {'min': int(result[0]), 'max': int(result[1])}
 
-def left_side():
+def filter_component():
     # Fetch unique values from the database for dropdowns and checklists
     facility_types = get_unique_values("Facility Type")
     properties = get_unique_values("Property")
@@ -270,13 +257,16 @@ def left_side():
                         value="Facility Type",
                         placeholder="Select Dimension",
                     ),
+                    html.Br(),
+                    html.Br(),
+                    html.Br(),
                 ],
                 style={"display": "flex", "flexDirection": "column", "padding": "10px"},
             ),
         ]
     )
 
-def right_side():
+def facilities_cards():
     return html.Div(
         [
             dcc.Loading(
@@ -288,7 +278,7 @@ def right_side():
     )
 
 def query_facilities(filters):
-    con = sqlite3.connect("health_facilities.db")
+    con = sqlite3.connect("sqlite_dbs/health_facilities.db")
 
     # Base query
     base_query = """
@@ -510,6 +500,9 @@ def update_facility_content(
         lambda x: x.replace('\n', '<br>') if x else "Not available"
     )
 
+    # Format the 'Operating Hours' column
+    filtered_df['Operating Hours'] = filtered_df['Operating Hours'].apply(lambda x: x.title() if x else "Unknown")
+
     if filtered_df.empty:
         # Create a figure with a textual message instead of a map
         fig = go.Figure()
@@ -558,8 +551,6 @@ def update_facility_content(
     # Extract the color mappings
     color_mapping = {point['name']: point['marker']['color'] for point in fig.data}
 
-    print(color_mapping)
-
     cards_content = html.Div(
         create_facility_cards(filtered_df, color_mapping, colorConfiguration), style={"display": "flex", "flexWrap": "wrap"}
     )
@@ -584,6 +575,10 @@ def create_facility_cards(df, color_mapping, color_configuration):
         # Convert the list into a comma-separated string, or use "Not available" if the list is empty
         # services_offered = ', '.join([item.replace('_', ' ').title() for item in retrieved_list]) if retrieved_list else "Not available"
         services_offered = row.get("Services Offer")
+        ambulance_availability = row.get("Ambulance")
+        maternity_bed = row.get("Maternity bed")
+        total_bed = row.get("Total bed")
+        operating_days = row.get("Operating Days")
         facility_type = row.get('Facility Type', 'Unknown').replace('_', ' ').title()
 
         card_content = [
@@ -606,13 +601,17 @@ def create_facility_cards(df, color_mapping, color_configuration):
             dbc.CardBody(
                 [
                     html.P([html.Strong("Property: "), row.get('formattedProperty', 'Unknown')]),
+                    html.P([html.Strong("Operating Days: "), operating_days]),
                     html.P([html.Strong("Operating Hours: "), row.get('Operating Hours', 'Unknown')]),
-                    html.P([html.Strong("Services Offered: "), services_offered]),
+                    html.P([html.Strong("Ambulances: "), ambulance_availability]),
+                    html.P([html.Strong("Maternity Bed: "), maternity_bed]),
+                    html.P([html.Strong("Total Bed: "), total_bed]),
+                    # html.P([html.Strong("Services Offered: "), services_offered]),
                 ],
                 style={'fontSize': '12px', 'lineHeight': '1.2'}
             ),
         ]
-        cards.append(dbc.Card(card_content, style={"width": "16rem", "margin": "8px"}))
+        cards.append(dbc.Card(card_content, style={"width": "100%", "margin": "4px"}))
     return cards
 
 # @my_app.callback(

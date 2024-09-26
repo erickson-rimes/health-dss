@@ -2,7 +2,7 @@ import pandas as pd
 import sqlite3
 
 # Load the Excel file
-file_path = './tl_health_facilities.xlsx'
+file_path = './tl_health_facilities_edited.xlsx'
 sheets_data = pd.read_excel(file_path, sheet_name=None)  # Load all sheets into a dictionary
 
 administrative_posts = [

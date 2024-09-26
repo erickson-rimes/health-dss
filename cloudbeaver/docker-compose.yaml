@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+  cloudbeaver:
+      image: dbeaver/cloudbeaver:latest
+      container_name: cloudbeaver
+      environment:
+        - CB_ADMIN_NAME=cbadmin  # Admin username for CloudBeaver
+        - CB_ADMIN_PASSWORD=cbadmin1234  # Admin password for CloudBeaver
+        - CB_AUTO_CREATE_DB=true  # Auto-create initial database connections
+        - CB_DB_DRIVERS=sqlite  # Specify SQLite driver to be used
+        - CB_DB_CONNECTIONS='[{"name":"Case Reports","driver":"sqlite","databaseFile":"/sqlite_dbs/case_reports.db"}]'
+      ports:
+        - 8978:8978
+      volumes:
+        - /Users/ericksoncruz/Documents/RIMES/health-dss/dash/sqlite_dbs:/sqlite_dbs  # Mount local directory to CloudBeaver container

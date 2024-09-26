@@ -121,7 +121,7 @@ def update_case_reports_store(start_date, end_date, weather_case_type_filter, we
     return filtered_df.to_json(date_format="iso", orient="split")
 
 def query_case_reports(filters):
-    con = sqlite3.connect('case_reports.db')
+    con = sqlite3.connect('sqlite_dbs/case_reports.db')
 
     base_query = "SELECT * FROM case_reports"
 

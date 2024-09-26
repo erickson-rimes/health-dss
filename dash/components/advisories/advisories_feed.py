@@ -15,7 +15,7 @@ import uuid
 
 # Connect to the SQLite database
 def fetch_advisories(offset=0, limit=10):
-    conn = sqlite3.connect('advisories.db')
+    conn = sqlite3.connect('sqlite_dbs/advisories.db')
     query = f"SELECT * FROM advisory ORDER BY publication_date DESC LIMIT {limit} OFFSET {offset}"
     advisories = pd.read_sql_query(query, conn)
     # print(advisories)
@@ -23,7 +23,7 @@ def fetch_advisories(offset=0, limit=10):
     return advisories
 
 def fetch_advisory_details(advisory_id):
-    conn = sqlite3.connect('advisories.db')
+    conn = sqlite3.connect('sqlite_dbs/advisories.db')
     query = f"SELECT * FROM advisory WHERE id = ?"
     advisory = pd.read_sql_query(query, conn, params=(advisory_id,))
     conn.close()
@@ -231,7 +231,7 @@ def save_advisory(n_clicks, title, content, media_contents):
     print("Saving new advisory...")
     # print(new_advisory)
 
-    conn = sqlite3.connect('advisories.db')
+    conn = sqlite3.connect('sqlite_dbs/advisories.db')
     
     insert_advisory(conn, new_advisory)
 
