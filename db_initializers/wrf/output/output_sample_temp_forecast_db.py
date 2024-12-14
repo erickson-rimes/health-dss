@@ -1,5 +1,12 @@
 # from dataex_region_data_analysis.py  -mt ecmwf_hres -r tmax_daily_tmax_region -ai 14913390-cb22-433c-b291-d0888a0541c8 -uf ADM1_EN -of json -o tmax_daily_tmax_region_data.json
 
+# -mt ecmwf_hres this is the type of data to be pulled
+# -r tmax_daily_tmax_region is the weather parameter
+# -ai 14913390-cb22-433c-b291-d0888a0541c8 is the asset identifier
+# -uf ADM1_EN is the unique field
+# -of is the output format
+# -o is the output file
+
 import json
 import sqlite3
 from datetime import datetime, timedelta
