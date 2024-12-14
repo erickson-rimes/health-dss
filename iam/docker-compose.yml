@@ -33,7 +33,7 @@ services:
     volumes:
       - ./postgres_data:/var/lib/postgresql/data
     networks:
-      - crish-network
+      - superset_default
 
   iam:
     depends_on:
@@ -61,8 +61,8 @@ services:
       retries: 5
     command: start-dev
     networks:
-      - crish-network
+      - superset_default
 
 networks:
-  crish-network:
+  superset_default:
     external: true

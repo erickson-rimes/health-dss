@@ -37,11 +37,13 @@ class AuthOIDCView(AuthOIDView):
                 
                 if "pgadmin" in user_roles:
                     role = sm.find_role('Admin')
+                else:
+                    role = sm.find_role('Public')
                 print('Assigning role: ')
                 print(role)
                 user = sm.add_user(info.get('preferred_username'), info.get('given_name'), info.get('family_name'),
                                    info.get('email'), role)
-
+                
             login_user(user, remember=False)
             return redirect(self.appbuilder.get_url_for_index)
 

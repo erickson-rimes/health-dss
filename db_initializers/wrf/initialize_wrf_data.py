@@ -12,14 +12,8 @@ def create_table_if_not_exists(conn):
     
     # SQL query to create the table with a TEXT column for geometry
     create_table_query = """
-    CREATE TABLE IF NOT EXISTS geo_features (
+    CREATE TABLE IF NOT EXISTS geo_features_temp (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        title TEXT,
-        fill TEXT,
-        fill_opacity REAL,
-        stroke TEXT,
-        stroke_opacity REAL,
-        stroke_width REAL,
         geometry TEXT
     );
     """
@@ -47,7 +41,7 @@ def insert_features(features, conn):
         
         # SQL query to insert the feature into the geo_features table
         query = """
-            INSERT INTO geo_features (title, fill, fill_opacity, stroke, stroke_opacity, stroke_width, geometry)
+            INSERT INTO geo_features_temp (title, fill, fill_opacity, stroke, stroke_opacity, stroke_width, geometry)
             VALUES (?, ?, ?, ?, ?, ?, ?)
         """
         
@@ -75,18 +69,38 @@ def main():
         # Create the table if it doesn't exist
         create_table_if_not_exists(conn)
         
+        cursor = conn.cursor()
+
         # Ensure the GeoJSON contains features
         if geojson_data['type'] == 'FeatureCollection':
             features = geojson_data['features']
             
-            # Insert features into the database
-            insert_features(features, conn)
+            query = """
+                INSERT INTO geo_features_temp (geometry)
+                VALUES (?)
+            """
+            
+            for feature in features:
+                geometry = json.dumps({"features": [feature], "type":"FeatureCollection"})
+                cursor.execute(query, (geometry,))
+            
             print(f"{len(features)} features inserted into the database.")
+
+        # query = """
+        #     INSERT INTO geo_features_temp (geometry) 
+        #     VALUES (?)
+        # """
+
+        # cursor.execute(query, (json.dumps(geojson_data),))
+
+        # print("GeoJSON data inserted into the database.")
         
-        # Close the connection
-        conn.close()
-    except Exception as e:
+        conn.commit()
+    except sqlite3.Error as e:
         print(f"Error: {e}")
+    finally:
+        if conn:
+            conn.close()
 
 if __name__ == "__main__":
     main()

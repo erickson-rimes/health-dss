@@ -1,7 +1,5 @@
 # import os
 
-# clientId = os.path.expandvars('$PGADMIN_OIDC_CLIENT_ID')
-# clientSecret = os.path.expandvars('$PGADMIN_OIDC_CLIENT_SECRET')
 OAUTH2_CONFIG = [
     {
         'OAUTH2_NAME': 'CRISH',
